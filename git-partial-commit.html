@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>Bobbbb</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="/theme/css/poole.css" />
+		<link rel="stylesheet" href="/theme/css/hyde.css" />
+		<link rel="stylesheet" href="/theme/css/syntax.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+		<!-- RSS -->
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+	</head>
+
+	<body class="theme-base-0d">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="/images/avatar.png">
+					Bobbbb
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">I'm SpongeBob, a student from BUAA. Working in ACT lab. </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-nav">
+			<a class="sidebar-nav-item" href="mailto:guilherme.sft@gmail.com">
+				<i class="fa fa-envelope"></i>
+			</a>
+			<a class="sidebar-nav-item" href="geek_bmj@163.com">
+				<i class="fa fa-email"></i>
+			</a>
+			<a class="sidebar-nav-item" href="https://github.com/spongeBbob">
+				<i class="fa fa-github"></i>
+			</a>
+			<a class="sidebar-nav-item" href="None">
+				<i class="fa fa-feed"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">Git: partial commit</h1>
+	<span class="post-date">四 28 一月 2016</span>
+	<p>This post will demonstrate one of many cool features available in Git, partial commit. This feature allows add just
+some hunk of a file leaving other ones for future commit.</p>
+<p>Let's suppose in a project there is the following source code:</p>
+<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+<span class="kt">void</span> <span class="nf">foo</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">bar</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">foo</span><span class="p">();</span>
+    <span class="n">bar</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello, it&#39;s foo function here</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">bar</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello, it&#39;s bar function here. Wow! You send me a %d... it&#39;s such a number! ;)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>In this brand new repository there is only one commit:</p>
+<p><img alt="" src="/images/partial_commit_1.png" /></p>
+<p>And the first change is made:</p>
+<p><img alt="" src="/images/partial_commit_2.png" /></p>
+<p>Suppose a colleague requests another update in same file. He/She asks to change the name of the <code>foo()</code> function to
+<code>xpto()</code>. So after both changes the diff is:</p>
+<p><img alt="" src="/images/partial_commit_3.png" /></p>
+<p>Nice, now it's time to commit the changes. However, it's necessary commit each hunk in different commits. Fortunately
+git has a feature that will help on this situation. The commands <code>git add</code> and <code>git commit</code> allows user to select which
+hunks of a file should be added. This is done by passing the <code>-p, --patch</code> option. In our example, let's use <code>git commit</code>
+to choose the hunks should be added in first commit:</p>
+<p><img alt="" src="/images/partial_commit_4.png" /></p>
+<p>As can be seen, git shows each hunk and asks the user for what should be done with it. The options are: [y,n,q,a,d,/,s,e,?].
+To see help text, type <code>?</code>. The following text shall be shown:</p>
+<div class="highlight"><pre><span></span>y - stage this hunk
+n - do not stage this hunk
+q - quit; do not stage this hunk or any of the remaining ones
+a - stage this hunk and all later hunks in the file
+d - do not stage this hunk or any of the later hunks in the file
+g - select a hunk to go to
+/ - search for a hunk matching the given regex
+j - leave this hunk undecided, see next undecided hunk
+J - leave this hunk undecided, see next hunk
+k - leave this hunk undecided, see previous undecided hunk
+K - leave this hunk undecided, see previous hunk
+s - split the current hunk into smaller hunks
+e - manually edit the current hunk
+? - print help
+</pre></div>
+
+
+<p>In this example, it shown the first file's hunk. In the first commit, should be
+committed the changes related with function <code>bar()</code> only. The this hunk must be
+ignored. Thus, the option <code>n</code> is the right one.</p>
+<p><img alt="" src="/images/partial_commit_5.png" /></p>
+<p>In the following, git shows all further changes as an unique hunk. It's necessary
+split them the smaller hunks. For do that, there is two options: <code>s</code> and <code>e</code>.
+The first one tells git to split the hunk into smaller pieces. The <code>e</code> option,
+in the other hand, allows user choose manually each lines should added. In this
+post the go with option <code>s</code>. Git should shown something similar to this:</p>
+<p><img alt="" src="/images/partial_commit_6.png" /></p>
+<p>The previous hunk has been split into 3 hunks. Git now will iterate all of them
+asking the user what should be done with each one. The first hunk should also be
+ignored. The second one is the first change related with the function <code>bar()</code> and
+should be added. To that task, the <code>y</code> is the right command.</p>
+<p><img alt="" src="/images/partial_commit_7.png" /></p>
+<p>Third hunk should be added too</p>
+<p><img alt="" src="/images/partial_commit_8.png" /></p>
+<p>Once there are no more hunks, as we used the <code>git commit</code> command, the editor
+will be open to the user insert the commit message. That's it.</p>
+<p><img alt="" src="/images/partial_commit_9.png" /></p>
+<p>Now with the first commit contains the only the changes within <code>bar()</code> function,
+further hunks might be committed in the second commit:</p>
+<p><img alt="" src="/images/partial_commit_10.png" /></p>
+<p>I hope you have enjoyed the tip. ;)</p>
+	<div id="disqus_thread"></div>
+		<script type="text/javascript">
+			var disqus_shortname = 'spongeBbob';
+			(function() {
+	 			var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	 			dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	 			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	 		})();
+		</script>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</div>
+		</div>
+	</body>
+</html>
