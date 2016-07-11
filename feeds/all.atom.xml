@@ -1,5 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Bobbbb</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-07-10T18:59:00+08:00</updated><entry><title>word emdedding in GloVe</title><link href="/word-emdedding-in-glove.html" rel="alternate"></link><published>2016-07-10T18:59:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-10:word-emdedding-in-glove.html</id><summary type="html">&lt;p&gt;A week ago I came to the ACT lab. My mentor gave me some papers to read. One in these papers ,&lt;a href="http://nlp.stanford.edu/pubs/glove.pdf"&gt;GloVe: Global Vectors for Word Representation.&lt;/a&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Bobbbb</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-07-11T11:26:00+08:00</updated><entry><title>GloVe Sumarry</title><link href="/glove-sumarry.html" rel="alternate"></link><published>2016-07-11T11:26:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-11:glove-sumarry.html</id><summary type="html">&lt;p&gt;在前边的文章我们已经讲了词向量的两种表达方式，一种是&lt;code&gt;"one-hot"&lt;/code&gt;，另外一种是&lt;code&gt;"distributed word representation"&lt;/code&gt;。针对"one-hot"的种种弊端：只能表达词本身是否出现，而无法表达词与词之间的关系。而自然语言处理中的一个基本的指导思想就是，一个词的含义，跟它的上下文有关系。比如我们可以想像一下，“坚硬的”和“冰块”共同出现的概率一定要比“坚硬的”和“河流”共同出现的概率大。他们的上下文隐含一定的语义信息。&lt;/p&gt;
+&lt;p&gt;针使用矩阵对表示词向量的方法，主要两种方法。一种是&lt;code&gt;“word-doc”&lt;/code&gt;另一种是&lt;code&gt;"word-word"&lt;/code&gt;，用两种统计信息来表达一个贡献矩阵。而我们今天要讨论的&lt;code&gt;GloVe&lt;/code&gt;就是采用&lt;code&gt;“word-word”&lt;/code&gt;的共现矩阵。&lt;/p&gt;
+&lt;p&gt;但是，直接直接从共现矩阵中提取的词向量，有这样一个问题，维度非常高，和预料库的文档数，以及词汇量成正相关。并且还有另外一个问题，这个矩阵可能非常稀疏。所以会浪费很多的计算和存储资源。如何解决呢？前面已经提到了。&lt;/p&gt;
+&lt;p&gt;下面就是&lt;code&gt;"distributed word representation"&lt;/code&gt;方法的优势，用一个相对低维度的向量来表示一个词的信息，而这些低维的向量也隐含了一些很有趣的信息，下面用一张图形象的表示。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/GloVe1.png" /&gt;&lt;/p&gt;
+&lt;p&gt;brother - sister = uncle - aunt&lt;/p&gt;
+&lt;p&gt;并且，这个支持线性的运算，brother - sister + aunt = uncle，是不是很神奇。既降低了维度，又保存了语义信息。&lt;/p&gt;
+&lt;p&gt;下面的关键问题就是如何训练得到一组词向量。GloVe是基于计数的方法，推导出一个&lt;code&gt;Objective Function&lt;/code&gt;，然后使用优化的方法来求解这个方程，最基本的原理就是&lt;code&gt;梯度下降&lt;/code&gt;，首先我们看一下这个方程是什么以及是怎么推导出来的，再来看如何使用梯度下降的方法来求&lt;code&gt;矩阵分解&lt;/code&gt;。&lt;/p&gt;
+&lt;h2&gt;目标函数及推导&lt;/h2&gt;
+&lt;p&gt;&lt;img alt="" src="/images/GloVe2.png" /&gt;&lt;/p&gt;
+&lt;p&gt;其中 &lt;em&gt;P&lt;/em&gt; 为两个词在原语料库中的共现次数，&lt;em&gt;f&lt;/em&gt; 为共现次数与权重的函数关系，Objective Function 的主体思想为：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;在最终词向量模型中，任何两个词向量的内积结果应尽量与两个词的共现次数一致。&lt;/li&gt;
+&lt;li&gt;如果某 word-pair 共现次数较低，应该弱化其对 Objective Function 的影响，避免噪音。&lt;/li&gt;
+&lt;li&gt;如果某 word-pair 共现次数过高，很有可能 dominate 整体模型的训练过程，应设定影响力上限。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;引用 &lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.jianshu.com/p/123fa49b6f41"&gt;SevenBlueLink&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;说实话，那个公式中偏移量的直观含义我也不太理解，是公式中推导出来的结果。等我想的更明白了一点再继续补充上来。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Pij = P(j|i) = Xij / Xi&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;表示一个词 &lt;em&gt;j&lt;/em&gt; 出现在上下文 &lt;em&gt;i&lt;/em&gt; 周围的概率&lt;/p&gt;
+&lt;p&gt;根据直观上的理解，我们判断词&lt;em&gt;Wi&lt;/em&gt;，&lt;em&gt;Wj&lt;/em&gt;以及他们的上下文&lt;em&gt;Wk&lt;/em&gt;，想要判定他们的相对概率大小，我们可以使用一个比值。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;F(Wi,Wj,Wk) = Pik / Pjk&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;由于属于一个非常大的泛函空间，所以需要对形式进行限制：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;需要编码比率中包含的信息，由于向量空间和线性结构的一致性，所以最直接的方法是F建模的是两个目标词向量的差值。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;F(Wi-Wj,Wk) = Pik / Pjk&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;上式中，等式右边是一个标量。如果F拥有复杂的结构，这样和需要得到线性结构的冲突，故F变为如下点乘形式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;F( T(Wi-Wj） · Wk) = Pik / Pjk&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Context &lt;em&gt;Wk&lt;/em&gt; 的词和目标词(&lt;em&gt;Wi-Wj&lt;/em&gt;)可以任意交换，所以模型需要能适应如此变形。在F满足对称性下，其形式为&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/GloVe3.png" /&gt;&lt;/p&gt;
+&lt;p&gt;联立上两个方程，可以得到：&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/GloVe4.png" /&gt;&lt;/p&gt;
+&lt;p&gt;解方程，得到&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/GloVe5.png" /&gt;&lt;/p&gt;
+&lt;p&gt;对上式进行变形—将吸收到的偏置中，引入的偏置，
+由于logx函数性质，防止它发散，引入一个偏移量&lt;em&gt;log（X）-&amp;gt; log(1+X)&lt;/em&gt; &lt;/p&gt;
+&lt;p&gt;最后推导出目标函数&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/GloVe2.png" /&gt;&lt;/p&gt;
+&lt;p&gt;这个函数的直观理解是，在最终词向量模型中，任何两个词向量的内积结果应尽量与两个词的共现次数一致。两个词向量的内积，对应着分解后的两个矩阵，一个word的vector表示，另一个是contex的vector表示。这也和推荐系统中的user - item矩阵分解类似。我们可以直观的理解，每一个维度暗含了一个该词（或用户）属性的意向，上下文（或商品）也暗含了一些属性的多少。他们的表示对这个词的匹配度（商品的匹配度）。&lt;/p&gt;
+&lt;p&gt;论文中讲求解这个问题使用的是一个，AdaGrad的方法，这个方法是一个带一些技巧的梯度下降。&lt;/p&gt;
+&lt;h2&gt;AdaGrad&amp;amp;梯度下降&lt;/h2&gt;
+&lt;p&gt;梯度下降法，就是利用负梯度方向来决定每次迭代的新的搜索方向，使得每次迭代能使待优化的目标函数逐步减小。梯度下降法是2范数下的最速下降法。 最速下降法的一种简单形式是：&lt;em&gt;x(k+1)=x(k)-a·g(k)&lt;/em&gt;,其中&lt;em&gt;a&lt;/em&gt;称为学习速率，可以是较小的常数。&lt;em&gt;g(k)&lt;/em&gt;是&lt;em&gt;x(k)&lt;/em&gt;的梯度。&lt;/p&gt;
+&lt;p&gt;这玩意的直观理解是什么呢？&lt;/p&gt;
+&lt;p&gt;有一个&lt;em&gt;U&lt;/em&gt;型的山谷。谷底有被恶魔抓走的公主，持剑少年的任务就是，在恶魔吃掉公主之前解救公主，所以为了尽快的达到山谷底，少年最快的方式就是沿着最陡峭的山坡往下跳，（假设少年只能水平跳然后落到一个山谷的一个位置），山坡的陡峭程度就是&lt;code&gt;梯度&lt;/code&gt;。在x-y坐标系中，对应的就是曲线的斜率。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/GloVe6.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/GloVe7.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/GloVe8.png" /&gt;&lt;/p&gt;
+&lt;p&gt;这个是梯度下降分解矩阵的公式推导。&lt;/p&gt;
+&lt;p&gt;下面是代码&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;random&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;matrix_factorization&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;steps&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;10000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;0.0001&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;Q&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;step&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;xrange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;steps&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;xrange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;)):&lt;/span&gt;
+            &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;xrange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;])):&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;eij&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,:],&lt;/span&gt;&lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;[:,&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+                    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;xrange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+                        &lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;alpha&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;eij&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+                        &lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;alpha&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;eij&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+        &lt;span class="n"&gt;eR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;xrange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;)):&lt;/span&gt;
+            &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;xrange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;])):&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nb"&gt;pow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,:],&lt;/span&gt;&lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;[:,&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mf"&gt;0.001&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="k"&gt;break&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;This is Matrix P:&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;P&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;This is Matrix Q:&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;Q&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;This is Matrix P*Q:&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;R&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;([[&lt;/span&gt;&lt;span class="mf"&gt;9.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;],[&lt;/span&gt;&lt;span class="mf"&gt;8.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;3.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;],[&lt;/span&gt;&lt;span class="mf"&gt;3.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;8.0&lt;/span&gt;&lt;span class="p"&gt;],[&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;4.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mf"&gt;7.0&lt;/span&gt;&lt;span class="p"&gt;]])&lt;/span&gt;
+    &lt;span class="n"&gt;P&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+    &lt;span class="n"&gt;Q&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+    &lt;span class="n"&gt;K&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
+    &lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;Q&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;matrix_factorization&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__main__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;论文中的&lt;code&gt;AdaGrad&lt;/code&gt;中用了一个tricky的技巧。就是自适应的调整学习率。简单的还是用那个例子来说一下。&lt;/p&gt;
+&lt;p&gt;假设王子在救公主，朝着山谷的水平方向跳跃的时候，如果公主所在的山谷很陡峭，水平跳很近的距离，就可能导致，直接跨过了山谷，这样跳来跳去怎么也到不了谷底。一个好的方法是，当山谷很陡峭的时候，我就跳的水平距离短一些，当山谷比较平坦的时候，我再跳的远一些。根据山谷的陡峭程度动态调整水平跳跃的距离。&lt;/p&gt;
+&lt;p&gt;GloVe实现的代码中的训练部分&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;vector_size&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="c1"&gt;// learning rate times gradient for word vectors&lt;/span&gt;
+            &lt;span class="n"&gt;temp1&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fdiff&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;W&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;l2&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+            &lt;span class="n"&gt;temp2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fdiff&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;W&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;l1&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+            &lt;span class="c1"&gt;// adaptive updates&lt;/span&gt;
+            &lt;span class="n"&gt;W_updates1&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;temp1&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gradsq&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;l1&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+            &lt;span class="n"&gt;W_updates2&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;temp2&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gradsq&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;l2&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+            &lt;span class="n"&gt;W_updates1_sum&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;W_updates1&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+            &lt;span class="n"&gt;W_updates2_sum&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;W_updates2&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+            &lt;span class="n"&gt;gradsq&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;l1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;temp1&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;temp1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+            &lt;span class="n"&gt;gradsq&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;l2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;temp2&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;temp2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;在更新梯度的时候，最后除以sqrt(gradsq[b + l1])对应的梯度开方。&lt;/p&gt;
+&lt;p&gt;这样最终得到的W矩阵中就是分解之后的词向量矩阵。&lt;/p&gt;</summary><category term="NLP"></category></entry><entry><title>word emdedding summary</title><link href="/word-emdedding-summary.html" rel="alternate"></link><published>2016-07-10T18:59:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-10:word-emdedding-summary.html</id><summary type="html">&lt;p&gt;A week ago I came to the ACT lab. My mentor gave me some papers to read. One in these papers ,&lt;a href="http://nlp.stanford.edu/pubs/glove.pdf"&gt;GloVe: Global Vectors for Word Representation.&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This paper introduces a method to  learn vector space representations of words. The model efficiently leverages statistical information by training only on the nonzero elements in a word-word co- occurrence matrix. The result is a new global logbilinear regression model.&lt;/p&gt;
 &lt;h2&gt;What is word embedding?&lt;/h2&gt;
 &lt;p&gt;In a word, use a vector to represent a word. In this way, there are many intersting things we can get,like capturing  semantic,doing word analogy task. King - Queen = Man - Women. Just like [5,5] - [1,1] = [4,4] - [0,0].&lt;/p&gt;
@@ -25,7 +136,18 @@
 &lt;p&gt;"You shall know a word by the company it keeps." - J.R.Firth 1957&lt;/p&gt;
 &lt;p&gt;this is a state-of-the-art idea in the normal NLP.&lt;/p&gt;
 &lt;p&gt;&lt;img alt="" src="/images/word-em1.png" /&gt;&lt;/p&gt;
-&lt;p&gt;how to use a the contex to represent word?&lt;/p&gt;
+&lt;p&gt;How powerful distributed representations are is clear from a simple example:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;small apple =  [-0.2 -0.2 0.0  0.1]&lt;/li&gt;
+&lt;li&gt;big apple =     [-0.1 -0.2 0.0  0.1]&lt;/li&gt;
+&lt;li&gt;orange =            [-0.1  0.5  0.0  0.3]&lt;/li&gt;
+&lt;li&gt;strawberry =     [-0.3  0.1  0.0 0.5]&lt;/li&gt;
+&lt;li&gt;car =                    [0.0  0.0 0.5  0.1]&lt;/li&gt;
+&lt;li&gt;truck =                [0.1 -0.1  0.5  0.2]&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If we look around and get the "neural" activity of [-0.2, 0.1, 0.0, 0.2], we do not know if we see have an apple, an orange, or a strawberry, buy we are damn sure that we see a fruit instead of a car or truck. So maybe we see a new fruit, which is more similar to an apple than to an orange (our "neural" activity is closer to the activity for an apple), but we see also that it is in some way different from the fruits we already know. So from this "neural" activity we learned a lot about the new object without knowing what it actually is.&lt;/p&gt;
+&lt;h2&gt;how to get a word vector&lt;/h2&gt;
+&lt;p&gt;there is a LSA example.&lt;/p&gt;
 &lt;p&gt;Cooccurrence Matrix&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;I like deep learning.&lt;/li&gt;
@@ -60,5 +182,5 @@
 
 
 &lt;p&gt;&lt;img alt="" src="/images/word-em3.png" /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;X = U\*S\*V&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;We only print the first row of the &lt;code&gt;U&lt;/code&gt; matrix to represent a word&lt;/p&gt;</summary><category term="NLP"></category></entry></feed>
+&lt;p&gt;&lt;code&gt;X = U*S*V&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;We only print the first two columns of the &lt;code&gt;U&lt;/code&gt; matrix to represent a word, and this is the traditional Latent Semantic Analysis (LSA). Use SVD to fatorize Words-Documents matix. And this method is widely used in product recommendation algorithm. I will write another blog to explain it.&lt;/p&gt;</summary><category term="NLP"></category></entry></feed>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>Bobbbb</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="/theme/css/poole.css" />
+		<link rel="stylesheet" href="/theme/css/hyde.css" />
+		<link rel="stylesheet" href="/theme/css/syntax.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+		<!-- RSS -->
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+	</head>
+
+	<body class="theme-base-0d">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="/images/avatar.png">
+					Bobbbb
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">I'm SpongeBob, a student from BUAA. Working in ACT lab. </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-nav">
+			<a class="sidebar-nav-item" href="mailto:guilherme.sft@gmail.com">
+				<i class="fa fa-envelope"></i>
+			</a>
+			<a class="sidebar-nav-item" href="geek_bmj@163.com">
+				<i class="fa fa-email"></i>
+			</a>
+			<a class="sidebar-nav-item" href="https://github.com/spongeBbob">
+				<i class="fa fa-github"></i>
+			</a>
+			<a class="sidebar-nav-item" href="None">
+				<i class="fa fa-feed"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">word emdedding summary</h1>
+	<span class="post-date">日 10 七月 2016</span>
+	<p>A week ago I came to the ACT lab. My mentor gave me some papers to read. One in these papers ,<a href="http://nlp.stanford.edu/pubs/glove.pdf">GloVe: Global Vectors for Word Representation.</a></p>
+<p>This paper introduces a method to  learn vector space representations of words. The model efficiently leverages statistical information by training only on the nonzero elements in a word-word co- occurrence matrix. The result is a new global logbilinear regression model.</p>
+<h2>What is word embedding?</h2>
+<p>In a word, use a vector to represent a word. In this way, there are many intersting things we can get,like capturing  semantic,doing word analogy task. King - Queen = Man - Women. Just like [5,5] - [1,1] = [4,4] - [0,0].</p>
+<ul>
+<li><code>One-hot Representation</code></li>
+</ul>
+<p>In Natural Language Processing a one-hot vector is a 1xN matrix (vector) used to distinguish each word in a vocabulary from every other word in the vocabulary. </p>
+<p>{I, like, deep, learning, NLP, enjoy, flying}</p>
+<ul>
+<li>[1000000] -&gt; I</li>
+<li>[0100000] -&gt; like</li>
+<li>[0010000] -&gt; deep</li>
+<li>[0001000] -&gt; learning</li>
+<li>[0000100] -&gt; NLP</li>
+<li>[0000010] -&gt; enjoy</li>
+<li>[0000001] -&gt; flying</li>
+</ul>
+<p>It will be a damn thing if the corpus becomes very large:
+20K(speech)–50K(PTB)–500K(big vocab)–13M(Google 1T), high-dimension can lead to a big problem, Even though the   CPU and GPU is very strong.Another problem ,there is no relation in two word vectors.</p>
+<ul>
+<li><code>Distributed Word Representation</code></li>
+</ul>
+<p>"You shall know a word by the company it keeps." - J.R.Firth 1957</p>
+<p>this is a state-of-the-art idea in the normal NLP.</p>
+<p><img alt="" src="/images/word-em1.png" /></p>
+<p>How powerful distributed representations are is clear from a simple example:</p>
+<ul>
+<li>small apple =  [-0.2 -0.2 0.0  0.1]</li>
+<li>big apple =     [-0.1 -0.2 0.0  0.1]</li>
+<li>orange =            [-0.1  0.5  0.0  0.3]</li>
+<li>strawberry =     [-0.3  0.1  0.0 0.5]</li>
+<li>car =                    [0.0  0.0 0.5  0.1]</li>
+<li>truck =                [0.1 -0.1  0.5  0.2]</li>
+</ul>
+<p>If we look around and get the "neural" activity of [-0.2, 0.1, 0.0, 0.2], we do not know if we see have an apple, an orange, or a strawberry, buy we are damn sure that we see a fruit instead of a car or truck. So maybe we see a new fruit, which is more similar to an apple than to an orange (our "neural" activity is closer to the activity for an apple), but we see also that it is in some way different from the fruits we already know. So from this "neural" activity we learned a lot about the new object without knowing what it actually is.</p>
+<h2>how to get a word vector</h2>
+<p>there is a LSA example.</p>
+<p>Cooccurrence Matrix</p>
+<ul>
+<li>I like deep learning.</li>
+<li>I like NLP.</li>
+<li>I enjoy flying.</li>
+</ul>
+<p><img alt="" src="/images/word-em2.png" /></p>
+<p>We use SVD to do a MF.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">la</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span>
+<span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">,</span><span class="s2">&quot;like&quot;</span><span class="p">,</span><span class="s2">&quot;enjoy&quot;</span><span class="p">,</span><span class="s2">&quot;deep&quot;</span><span class="p">,</span><span class="s2">&quot;learning&quot;</span><span class="p">,</span><span class="s2">&quot;NLP&quot;</span><span class="p">,</span><span class="s2">&quot;flying&quot;</span><span class="p">,</span><span class="s2">&quot;,&quot;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vh</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">X</span> <span class="p">,</span><span class="n">full_matrices</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">U</span>
+<span class="k">print</span> <span class="n">s</span>
+<span class="k">print</span> <span class="n">Vh</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<p><img alt="" src="/images/word-em3.png" /></p>
+<p><code>X = U*S*V</code></p>
+<p>We only print the first two columns of the <code>U</code> matrix to represent a word, and this is the traditional Latent Semantic Analysis (LSA). Use SVD to fatorize Words-Documents matix. And this method is widely used in product recommendation algorithm. I will write another blog to explain it.</p>
+	<div id="disqus_thread"></div>
+		<script type="text/javascript">
+			var disqus_shortname = 'spongeBbob';
+			(function() {
+	 			var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	 			dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	 			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	 		})();
+		</script>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</div>
+		</div>
+	</body>
+</html>

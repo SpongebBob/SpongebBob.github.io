@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>Bobbbb</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="/theme/css/poole.css" />
+		<link rel="stylesheet" href="/theme/css/hyde.css" />
+		<link rel="stylesheet" href="/theme/css/syntax.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+		<!-- RSS -->
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+	</head>
+
+	<body class="theme-base-0d">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="/images/avatar.png">
+					Bobbbb
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">I'm SpongeBob, a student from BUAA. Working in ACT lab. </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-nav">
+			<a class="sidebar-nav-item" href="mailto:guilherme.sft@gmail.com">
+				<i class="fa fa-envelope"></i>
+			</a>
+			<a class="sidebar-nav-item" href="geek_bmj@163.com">
+				<i class="fa fa-email"></i>
+			</a>
+			<a class="sidebar-nav-item" href="https://github.com/spongeBbob">
+				<i class="fa fa-github"></i>
+			</a>
+			<a class="sidebar-nav-item" href="None">
+				<i class="fa fa-feed"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">GloVe Sumarry</h1>
+	<span class="post-date">一 11 七月 2016</span>
+	<p>在前边的文章我们已经讲了词向量的两种表达方式，一种是<code>"one-hot"</code>，另外一种是<code>"distributed word representation"</code>。针对"one-hot"的种种弊端：只能表达词本身是否出现，而无法表达词与词之间的关系。而自然语言处理中的一个基本的指导思想就是，一个词的含义，跟它的上下文有关系。比如我们可以想像一下，“坚硬的”和“冰块”共同出现的概率一定要比“坚硬的”和“河流”共同出现的概率大。他们的上下文隐含一定的语义信息。</p>
+<p>针使用矩阵对表示词向量的方法，主要两种方法。一种是<code>“word-doc”</code>另一种是<code>"word-word"</code>，用两种统计信息来表达一个贡献矩阵。而我们今天要讨论的<code>GloVe</code>就是采用<code>“word-word”</code>的共现矩阵。</p>
+<p>但是，直接直接从共现矩阵中提取的词向量，有这样一个问题，维度非常高，和预料库的文档数，以及词汇量成正相关。并且还有另外一个问题，这个矩阵可能非常稀疏。所以会浪费很多的计算和存储资源。如何解决呢？前面已经提到了。</p>
+<p>下面就是<code>"distributed word representation"</code>方法的优势，用一个相对低维度的向量来表示一个词的信息，而这些低维的向量也隐含了一些很有趣的信息，下面用一张图形象的表示。</p>
+<p><img alt="" src="/images/GloVe1.png" /></p>
+<p>brother - sister = uncle - aunt</p>
+<p>并且，这个支持线性的运算，brother - sister + aunt = uncle，是不是很神奇。既降低了维度，又保存了语义信息。</p>
+<p>下面的关键问题就是如何训练得到一组词向量。GloVe是基于计数的方法，推导出一个<code>Objective Function</code>，然后使用优化的方法来求解这个方程，最基本的原理就是<code>梯度下降</code>，首先我们看一下这个方程是什么以及是怎么推导出来的，再来看如何使用梯度下降的方法来求<code>矩阵分解</code>。</p>
+<h2>目标函数及推导</h2>
+<p><img alt="" src="/images/GloVe2.png" /></p>
+<p>其中 <em>P</em> 为两个词在原语料库中的共现次数，<em>f</em> 为共现次数与权重的函数关系，Objective Function 的主体思想为：</p>
+<ul>
+<li>在最终词向量模型中，任何两个词向量的内积结果应尽量与两个词的共现次数一致。</li>
+<li>如果某 word-pair 共现次数较低，应该弱化其对 Objective Function 的影响，避免噪音。</li>
+<li>如果某 word-pair 共现次数过高，很有可能 dominate 整体模型的训练过程，应设定影响力上限。</li>
+</ul>
+<p>引用 </p>
+<p><a href="http://www.jianshu.com/p/123fa49b6f41">SevenBlueLink</a></p>
+<p>说实话，那个公式中偏移量的直观含义我也不太理解，是公式中推导出来的结果。等我想的更明白了一点再继续补充上来。</p>
+<p><em>Pij = P(j|i) = Xij / Xi</em></p>
+<p>表示一个词 <em>j</em> 出现在上下文 <em>i</em> 周围的概率</p>
+<p>根据直观上的理解，我们判断词<em>Wi</em>，<em>Wj</em>以及他们的上下文<em>Wk</em>，想要判定他们的相对概率大小，我们可以使用一个比值。</p>
+<p><em>F(Wi,Wj,Wk) = Pik / Pjk</em></p>
+<p>由于属于一个非常大的泛函空间，所以需要对形式进行限制：</p>
+<ul>
+<li>需要编码比率中包含的信息，由于向量空间和线性结构的一致性，所以最直接的方法是F建模的是两个目标词向量的差值。</li>
+</ul>
+<p><em>F(Wi-Wj,Wk) = Pik / Pjk</em></p>
+<ul>
+<li>上式中，等式右边是一个标量。如果F拥有复杂的结构，这样和需要得到线性结构的冲突，故F变为如下点乘形式</li>
+</ul>
+<p><em>F( T(Wi-Wj） · Wk) = Pik / Pjk</em></p>
+<p>Context <em>Wk</em> 的词和目标词(<em>Wi-Wj</em>)可以任意交换，所以模型需要能适应如此变形。在F满足对称性下，其形式为</p>
+<p><img alt="" src="/images/GloVe3.png" /></p>
+<p>联立上两个方程，可以得到：</p>
+<p><img alt="" src="/images/GloVe4.png" /></p>
+<p>解方程，得到</p>
+<p><img alt="" src="/images/GloVe5.png" /></p>
+<p>对上式进行变形—将吸收到的偏置中，引入的偏置，
+由于logx函数性质，防止它发散，引入一个偏移量<em>log（X）-&gt; log(1+X)</em> </p>
+<p>最后推导出目标函数</p>
+<p><img alt="" src="/images/GloVe2.png" /></p>
+<p>这个函数的直观理解是，在最终词向量模型中，任何两个词向量的内积结果应尽量与两个词的共现次数一致。两个词向量的内积，对应着分解后的两个矩阵，一个word的vector表示，另一个是contex的vector表示。这也和推荐系统中的user - item矩阵分解类似。我们可以直观的理解，每一个维度暗含了一个该词（或用户）属性的意向，上下文（或商品）也暗含了一些属性的多少。他们的表示对这个词的匹配度（商品的匹配度）。</p>
+<p>论文中讲求解这个问题使用的是一个，AdaGrad的方法，这个方法是一个带一些技巧的梯度下降。</p>
+<h2>AdaGrad&amp;梯度下降</h2>
+<p>梯度下降法，就是利用负梯度方向来决定每次迭代的新的搜索方向，使得每次迭代能使待优化的目标函数逐步减小。梯度下降法是2范数下的最速下降法。 最速下降法的一种简单形式是：<em>x(k+1)=x(k)-a·g(k)</em>,其中<em>a</em>称为学习速率，可以是较小的常数。<em>g(k)</em>是<em>x(k)</em>的梯度。</p>
+<p>这玩意的直观理解是什么呢？</p>
+<p>有一个<em>U</em>型的山谷。谷底有被恶魔抓走的公主，持剑少年的任务就是，在恶魔吃掉公主之前解救公主，所以为了尽快的达到山谷底，少年最快的方式就是沿着最陡峭的山坡往下跳，（假设少年只能水平跳然后落到一个山谷的一个位置），山坡的陡峭程度就是<code>梯度</code>。在x-y坐标系中，对应的就是曲线的斜率。</p>
+<p><img alt="" src="/images/GloVe6.png" /></p>
+<p><img alt="" src="/images/GloVe7.png" /></p>
+<p><img alt="" src="/images/GloVe8.png" /></p>
+<p>这个是梯度下降分解矩阵的公式推导。</p>
+<p>下面是代码</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="k">def</span> <span class="nf">matrix_factorization</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">):</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">eij</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,:],</span><span class="n">Q</span><span class="p">[:,</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+                        <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">eij</span> <span class="o">*</span> <span class="n">Q</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+                        <span class="n">Q</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">eij</span> <span class="o">*</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+        <span class="n">eR</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">Q</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">e</span> <span class="o">+</span> <span class="nb">pow</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,:],</span><span class="n">Q</span><span class="p">[:,</span><span class="n">j</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">e</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">print</span> <span class="s2">&quot;This is Matrix P:&quot;</span>
+    <span class="k">print</span> <span class="n">P</span>
+    <span class="k">print</span> <span class="s2">&quot;This is Matrix Q:&quot;</span>
+    <span class="k">print</span> <span class="n">Q</span>
+    <span class="k">print</span> <span class="s2">&quot;This is Matrix P*Q:&quot;</span>
+    <span class="k">print</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">Q</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">P</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">T</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">9.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">],[</span><span class="mf">8.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">],[</span><span class="mf">3.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">8.0</span><span class="p">],[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">4.0</span><span class="p">,</span><span class="mf">7.0</span><span class="p">]])</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">P</span><span class="p">,</span><span class="n">Q</span> <span class="o">=</span> <span class="n">matrix_factorization</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">P</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">K</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+
+<p>论文中的<code>AdaGrad</code>中用了一个tricky的技巧。就是自适应的调整学习率。简单的还是用那个例子来说一下。</p>
+<p>假设王子在救公主，朝着山谷的水平方向跳跃的时候，如果公主所在的山谷很陡峭，水平跳很近的距离，就可能导致，直接跨过了山谷，这样跳来跳去怎么也到不了谷底。一个好的方法是，当山谷很陡峭的时候，我就跳的水平距离短一些，当山谷比较平坦的时候，我再跳的远一些。根据山谷的陡峭程度动态调整水平跳跃的距离。</p>
+<p>GloVe实现的代码中的训练部分</p>
+<div class="highlight"><pre><span></span> <span class="k">for</span> <span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="n">vector_size</span><span class="p">;</span> <span class="n">b</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// learning rate times gradient for word vectors</span>
+            <span class="n">temp1</span> <span class="o">=</span> <span class="n">fdiff</span> <span class="o">*</span> <span class="n">W</span><span class="p">[</span><span class="n">b</span> <span class="o">+</span> <span class="n">l2</span><span class="p">];</span>
+            <span class="n">temp2</span> <span class="o">=</span> <span class="n">fdiff</span> <span class="o">*</span> <span class="n">W</span><span class="p">[</span><span class="n">b</span> <span class="o">+</span> <span class="n">l1</span><span class="p">];</span>
+            <span class="c1">// adaptive updates</span>
+            <span class="n">W_updates1</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp1</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">gradsq</span><span class="p">[</span><span class="n">b</span> <span class="o">+</span> <span class="n">l1</span><span class="p">]);</span>
+            <span class="n">W_updates2</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp2</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">gradsq</span><span class="p">[</span><span class="n">b</span> <span class="o">+</span> <span class="n">l2</span><span class="p">]);</span>
+            <span class="n">W_updates1_sum</span> <span class="o">+=</span> <span class="n">W_updates1</span><span class="p">[</span><span class="n">b</span><span class="p">];</span>
+            <span class="n">W_updates2_sum</span> <span class="o">+=</span> <span class="n">W_updates2</span><span class="p">[</span><span class="n">b</span><span class="p">];</span>
+            <span class="n">gradsq</span><span class="p">[</span><span class="n">b</span> <span class="o">+</span> <span class="n">l1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">temp1</span> <span class="o">*</span> <span class="n">temp1</span><span class="p">;</span>
+            <span class="n">gradsq</span><span class="p">[</span><span class="n">b</span> <span class="o">+</span> <span class="n">l2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">temp2</span> <span class="o">*</span> <span class="n">temp2</span><span class="p">;</span>
+        <span class="p">}</span>
+</pre></div>
+
+
+<p>在更新梯度的时候，最后除以sqrt(gradsq[b + l1])对应的梯度开方。</p>
+<p>这样最终得到的W矩阵中就是分解之后的词向量矩阵。</p>
+	<div id="disqus_thread"></div>
+		<script type="text/javascript">
+			var disqus_shortname = 'spongeBbob';
+			(function() {
+	 			var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	 			dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	 			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	 		})();
+		</script>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</div>
+		</div>
+	</body>
+</html>
