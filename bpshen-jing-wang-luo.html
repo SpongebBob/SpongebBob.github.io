@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>Bobbbb</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="/theme/css/poole.css" />
+		<link rel="stylesheet" href="/theme/css/hyde.css" />
+		<link rel="stylesheet" href="/theme/css/syntax.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+		<!-- RSS -->
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+	</head>
+
+	<body class="theme-base-0d">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="/images/avatar.png">
+					Bobbbb
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">I'm SpongeBob, a student from BUAA. Working in ACT lab. </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-nav">
+			<a class="sidebar-nav-item" href="http://weibo.com/u/2893779987">
+				<i class="fa fa-weibo"></i>
+			</a>
+			<a class="sidebar-nav-item" href="https://github.com/spongeBbob">
+				<i class="fa fa-github"></i>
+			</a>
+			
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">BP神经网络</h1>
+	<span class="post-date">一 11 七月 2016</span>
+	<p>首先我们从感知器和单个神经元的关系来讲起
+单个神经元</p>
+<hr />
+<p>前几天上课的时候老师讲了一个感知器的例子。当时理解不深刻，只知道这东西可以通过学习来分类一个线性可分的东西。然后还讲了感知器中的一种奇怪的并不是梯度下降的方法来训练，然而梯度下降十分好理解和好用。线性分类器确实是一类比较简单的东西。</p>
+<p>单个神经元就是一个感知器，加上一个<code>sigmod</code>函数即可。一个神经元的训练也可以归结到一个线性回归的问题。一个比较直观的例子来自某个slide</p>
+<div class="highlight"><pre><span></span>Each day you get lunch at the cafeteria. Your diet consists of fish, chips, and ketchup. You get several portions of each. The cashier only tells you the total price of the meal. After several days, you should be able to figure out the price of each portion. The iterative approach: Start with random guesses for the prices and then adjust them to get a better fit to the observed prices of whole meals.
+</pre></div>
+
+
+<p>Each meal price gives a linear constraint on the prices of the portions:</p>
+<div class="math">$$price=X_{fish}W_{fish} + X_{chips}W_{chips} + X_{ketchup}W_{ketchup}$$</div>
+<p>The prices of the portions are like the weights in of a linear neuron.</p>
+<div class="math">$$W=(W_{fish} ,W_{chips},W{ketchup})$$</div>
+<p>We will start with guesses for the weights and then adjust the guesses slightly to give a better fit to the prices given by the cashier.</p>
+<p>训练一个神经元可以使用<code>梯度下降</code>...当然，训练整个BP神经网络我们也是使用的梯度下降方法。神经网络是由多个“神经元”（感知机）组成的，每个神经元图示如下：</p>
+<p><img alt="" src="/images/BP1.jpg" /></p>
+<p>这其实就是一个单层感知机，其输入是 <span class="math">\((X_1,X_2,X_3,1)\)</span> 的向量，其输出为神经网络 <span class="math">\(H_{W,b}(x)=f(W^Tx)=f(\sum_{i=1}^3W_ix_i+b)\)</span> ，其中<em>f</em>是一个激活函数，模拟的是生物神经元在接受一定的刺激之后产生兴奋信号，否则刺激不够的话，神经元保持抑制状态这种现象。这种由一个阈值决定两个极端的函数有点像示性函数，然而这里采用的是'Sigmoid'函数，其优点是连续可导。Sigmoid函数常被用作神经网络的阈值函数，将变量映射到0,1之间。
+</p>
+<div class="math">$$f(x) = \frac{1}{1+e^{-x}}$$</div>
+<p>图像如下</p>
+<p><img alt="" src="/images/BP2.jpg" /></p>
+<p>这个函数求导有个很好的特性 </p>
+<div class="math">$$f'(x) = f(x)(1-f(x))$$</div>
+<p> 这样Python代码如下：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sigmoid 函数，1/(1+e^-x)</span>
+<span class="sd">    :param x:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span><span class="o">+</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">dsigmoid</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sigmoid 函数的导数</span>
+<span class="sd">    :param y:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">y</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>神经网络模型</h2>
+<p>神经网络就是多个神经元的级联，上一级神经元的输出是下一级神经元的输入，而且信号在两级的两个神经元之间传播的时候需要乘上这两个神经元对应的权值。例如，下图就是一个简单的神经网络：</p>
+<p><img alt="" src="/images/BP3.jpg" /></p>
+<p>其中，一共有一个输入层，一个隐藏层和一个输出层。输入层有3个输入节点，标注为+1的那个节点是偏置节点，偏置节点不接受输入，输出总是+1。</p>
+<p>定义 <span class="math">\(W_{ij}^{l}\)</span>为第l层的第j个节点与第l+1层第i个节点之间的连接参数（或称权值，<span class="math">\(b_i^{(l)}\)</span>为第l层第i个偏置节点。</p>
+<h3>向前传播</h3>
+<p>向前传播比较好理解，就是根据输入值，连接参数，偏置量，sigmod函数求一个输出。对应函数的求值过程。后向传播对应训练的话，那么前向传播就对应预测（分类），并且训练的时候计算误差也要用到预测的输出值来计算误差。</p>
+<p>定义<span class="math">\(a_i^{(l)}\)</span>为第l层第i个节点的激活值（输出值），那么，当 <em>l=1</em>的时候，输入就等于输出，
+<span class="math">\(a_i^{(l)}=x_i\)</span>。下边以计算第二层的输出值。</p>
+<p><img alt="" src="/images/BP4.jpg" /></p>
+<p>很好理解，输入对应输出，简单的函数。</p>
+<p>下边是实现的python代码，其中，ai、ah、ao分别是输入层、隐藏层、输出层，而wi、wo则分别是输入层到隐藏层、隐藏层到输出层的权值矩阵。ni是输入层的神经元个数，nh是隐藏层的神经元个数，no是输出层神经元的个数，在本Python实现中，将偏置量一并放入了矩阵，这样进行线性代数运算就会方便一些。</p>
+<div class="highlight"><pre><span></span> <span class="k">def</span> <span class="nf">runNN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        前向传播进行分类</span>
+<span class="sd">        :param inputs:输入</span>
+<span class="sd">        :return:类别</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ni</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s1">&#39;incorrect number of inputs&#39;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ni</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ai</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nh</span><span class="p">):</span>
+            <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ni</span><span class="p">):</span>
+                <span class="nb">sum</span> <span class="o">+=</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ai</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">wi</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ah</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no</span><span class="p">):</span>
+            <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nh</span><span class="p">):</span>
+                <span class="nb">sum</span> <span class="o">+=</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ah</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">wo</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ao</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ao</span>
+</pre></div>
+
+
+<h3>向后传播</h3>
+<p>向后传播是训练神经网络的关键，后向传播指的是在训练的时候，根据最终输出的误差来调整倒数第二层、倒数第三层……第一层的参数的过程。这个，我们还是用很经典的梯度下降法。这部分的公式推起来比较麻烦，容我在纸上算上一算。</p>
+<p>定义 <span class="math">\(O_k\)</span> 是输出层的输出，<span class="math">\(T_k\)</span>为给定训练集的预期输出，那么 <code>Objective function</code>是<span class="math">\(E={\sum_{k=1}^n(O_k-T_k)}^2\)</span>,调整参数使用梯度下降法，还是那个套路，求偏导，偏导怎么求呢？链式法则啊！
+</p>
+<div class="math">$$\frac{\partial E}{\partial W_{jk}}=(O_k-T_k)\frac{\partial}{\partial W_{jk}}O_k$$</div>
+<p>
+而我们定义输出层的输入是
+</p>
+<div class="math">$$O_k = sigmod(\sum_{k=1}^K w_{jk}o_{jk})$$</div>
+<p>
+继续对sigmod使用链式法则，<span class="math">\(o_{jk}\)</span>是上层节点的，ie.隐藏层第i个节点到输出层第k个节点的输入。
+</p>
+<div class="math">$$\frac{\partial E}{\partial W_{jk}}=(O_k-T_k)O_k(1-O_k)o_{jk}$$</div>
+<p>
+这个公式中所有的量都已经知道了，可以使用梯度下降来迭代
+</p>
+<div class="math">$$W_{jk}=W_{jk}+\alpha\frac{\partial E}{\partial W_{jk}}$$</div>
+<p>
+其中<span class="math">\(\alpha\)</span>为学习率。</p>
+<p>下面计算输入层到隐藏层的权值调整。</p>
+<div class="math">$$\frac{\partial E}{\partial W_{ij}}=\sum_{k=1}^K(O_k-T_k)\frac{\partial}{\partial W_{ij}}O_k$$</div>
+<p>对参数<span class="math">\(W_{ij}\)</span>求偏导，注意这个地方有<span class="math">\(\sum\)</span>，这是因为，从输入层到隐藏层的权值参数<span class="math">\(W_{ij}\)</span>每一个都与<span class="math">\(W_{jk}o_{jk}\)</span>中的<span class="math">\(o_{jk}\)</span>有关。
+为了计算方面，我们定义<span class="math">\(X_k=\sum_{k=1}^K w_{jk}o_{jk})\)</span>这个是没有在sigmod中出现的，隐藏层到输出层的输入乘以权值。
+ </p>
+<div class="math">$$\frac{\partial E}{\partial W_{ij}}=\sum_{k=1}^K(O_k-T_k)\frac{\partial X_K}{\partial o_{jk}}\frac{\partial o_{jk}}{\partial W_{ij}}$$</div>
+<p>
+ 我们有<span class="math">\(O_j=o_{jk}\)</span>这个就是对应隐藏层第j个节点的输出。这样来表示，继续用链式法则。最终得到。
+  </p>
+<div class="math">$$\frac{\partial E}{\partial W_{ij}}=O_j(1-O_j)o_{ij}\sum_{k=1}^K(O_k-T_k)(1-O_k)O_k W_{jk}$$</div>
+<p>这样我们就把<span class="math">\(E\)</span>对<span class="math">\(W_{ij}\)</span>的偏导求出来了，使用梯度下降进行迭代。此神经网络可以解。对于偏执的输入不会变，动态调整其权重，只需要把它参数和其他节点看成一个完成的向量就可以</p>
+<h3>向后传播算法</h3>
+<ul>
+<li>随机初始化参数，利用向前传播和输入调整权重参数</li>
+<li>输出层的节点，使用<span class="math">\(\delta k = O_k(1-O_k)(O_k-T_k)o_{jk}\)</span></li>
+<li>隐藏层的节点，使用<span class="math">\(\delta j = \frac{\partial E}{\partial W_{ij}}=O_j(1-O_j)o_{ij}\sum_{k=1}^K(O_k-T_k)(1-O_k)O_k W_{jk}\)</span></li>
+</ul>
+<div class="highlight"><pre><span></span>  <span class="k">def</span> <span class="nf">backPropagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        后向传播算法</span>
+<span class="sd">        :param targets: 实例的类别 </span>
+<span class="sd">        :param N: 本次学习率</span>
+<span class="sd">        :param M: 上次学习率</span>
+<span class="sd">        :return: 最终的误差平方和的一半</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># http://www.youtube.com/watch?v=aVId8KMsdUU&amp;feature=BFa&amp;list=LLldMCkmXl4j9_v0HeKdNcRA</span>
+
+        <span class="c1"># 计算输出层 deltas</span>
+        <span class="c1"># dE/dw[j][k] = (t[k] - ao[k]) * s&#39;( SUM( w[j][k]*ah[j] ) ) * ah[j]</span>
+        <span class="n">output_deltas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">no</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no</span><span class="p">):</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">targets</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">ao</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">output_deltas</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">error</span> <span class="o">*</span> <span class="n">dsigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ao</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+        <span class="c1"># 更新输出层权值</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nh</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no</span><span class="p">):</span>
+                <span class="c1"># output_deltas[k] * self.ah[j] 才是 dError/dweight[j][k]</span>
+                <span class="n">change</span> <span class="o">=</span> <span class="n">output_deltas</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ah</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wo</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">change</span> <span class="o">+</span> <span class="n">M</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">co</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">co</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">change</span>
+
+        <span class="c1"># 计算隐藏层 deltas</span>
+        <span class="n">hidden_deltas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nh</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nh</span><span class="p">):</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no</span><span class="p">):</span>
+                <span class="n">error</span> <span class="o">+=</span> <span class="n">output_deltas</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">wo</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">hidden_deltas</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">error</span> <span class="o">*</span> <span class="n">dsigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ah</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+        <span class="c1"># 更新输入层权值</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ni</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nh</span><span class="p">):</span>
+                <span class="n">change</span> <span class="o">=</span> <span class="n">hidden_deltas</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ai</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="c1"># print &#39;activation&#39;,self.ai[i],&#39;synapse&#39;,i,j,&#39;change&#39;,change</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wi</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">change</span> <span class="o">+</span> <span class="n">M</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ci</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ci</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">change</span>
+
+        <span class="c1"># 计算误差平方和</span>
+        <span class="c1"># 1/2 是为了好看，**2 是平方</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">)):</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">targets</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">ao</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">error</span>
+</pre></div>
+
+
+<p>You can download the source code frome <a href="https://github.com/SpongebBob/Learn-ML/blob/master/bpnn.py">here</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+	<div id="disqus_thread"></div>
+		<script type="text/javascript">
+			var disqus_shortname = 'spongeBbob';
+			(function() {
+	 			var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	 			dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	 			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	 		})();
+		</script>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</div>
+		</div>
+	</body>
+</html>
