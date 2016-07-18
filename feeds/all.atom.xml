@@ -23,7 +23,7 @@ Learning from new data without forgetting prior knowledge is known as incrementa
 &lt;p&gt;&lt;img alt="" src="/images/IL8.png" /&gt;&lt;/p&gt;
 &lt;p&gt;We just do GD from the result before the corpus changes, use this form.&lt;/p&gt;
 &lt;p&gt;Second order partial derivatives. It indicates a convex function.
-&lt;img alt="" src="/images/IL8.png" /&gt;&lt;/p&gt;
+&lt;img alt="" src="/images/IL9.png" /&gt;&lt;/p&gt;
 &lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
