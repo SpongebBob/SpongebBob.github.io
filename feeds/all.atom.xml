@@ -1,5 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Bobbbb</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-07-11T20:26:00+08:00</updated><entry><title>BP神经网络</title><link href="/bpshen-jing-wang-luo.html" rel="alternate"></link><published>2016-07-11T20:26:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-11:bpshen-jing-wang-luo.html</id><summary type="html">&lt;p&gt;首先我们从感知器和单个神经元的关系来讲起
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Bobbbb</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-07-18T10:18:00+08:00</updated><entry><title>Incremental Learning in Glove</title><link href="/incremental-learning-in-glove.html" rel="alternate"></link><published>2016-07-18T10:18:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-18:incremental-learning-in-glove.html</id><summary type="html">&lt;p&gt;In industrial life, data usually become available gradually, this fact requires data analysis systems to have the capability to learn information incrementally.
+Learning from new data without forgetting prior knowledge is known as incremental learning. What's more, if we don't abadon these knowledge, the stupid thing is to learn from 0. In order to overcome this, we find out a way to learn knowledge from the incresement part. In this way, the previously learned information is not lost, and it could be more fast than learning from 0.&lt;/p&gt;
+&lt;p&gt;GloVe has been introduced in the previos blog. As we know, the objective function is&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/IL1.png" /&gt;&lt;/p&gt;
+&lt;p&gt;We use the gradient descent method to sovle this problem. when corpus inceases
+&lt;span class="math"&gt;\(X_{ij}\rightarrow X_{ij}+\delta X_{ij}\)&lt;/span&gt;
+&lt;span class="math"&gt;\(V\rightarrow V'\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;So,we can get the new objective function &lt;span class="math"&gt;\(J'\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/IL2.png" /&gt;&lt;/p&gt;
+&lt;p&gt;we can use 0 to fill the matrix,for in the weghting function,&lt;span class="math"&gt;\(f(0)=0\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/IL3.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/IL4.png" /&gt;&lt;/p&gt;
+&lt;p&gt;The weithting function can trans into this &lt;/p&gt;
+&lt;p&gt;&lt;span class="math"&gt;\(f_1(X_{ij}+\delta X_{ij})=f_0(X_{ij})+h\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;and we can get &lt;span class="math"&gt;\(|h|&amp;lt;1\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;OK,the function &lt;span class="math"&gt;\(J'\)&lt;/span&gt; is&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/IL5.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/IL6.png" /&gt;&lt;/p&gt;
+&lt;p&gt;Let's do the gradent descent&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/IL7.png" /&gt;&lt;/p&gt;
+&lt;p&gt;I have a question, the vector changes with iterating. But when i read the source code ,I find that they use multiy thread to do the process of GD. &lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/IL8.png" /&gt;&lt;/p&gt;
+&lt;p&gt;We just do GD from the result before the corpus changes, use this form.&lt;/p&gt;
+&lt;p&gt;Second order partial derivatives. It indicates a convex function.
+&lt;img alt="" src="/images/IL8.png" /&gt;&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</summary><category term="NLP"></category></entry><entry><title>BP神经网络</title><link href="/bpshen-jing-wang-luo.html" rel="alternate"></link><published>2016-07-11T20:26:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-11:bpshen-jing-wang-luo.html</id><summary type="html">&lt;p&gt;首先我们从感知器和单个神经元的关系来讲起
 单个神经元&lt;/p&gt;
 &lt;hr /&gt;
 &lt;p&gt;前几天上课的时候老师讲了一个感知器的例子。当时理解不深刻，只知道这东西可以通过学习来分类一个线性可分的东西。然后还讲了感知器中的一种奇怪的并不是梯度下降的方法来训练，然而梯度下降十分好理解和好用。线性分类器确实是一类比较简单的东西。&lt;/p&gt;
