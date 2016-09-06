@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>Bobbbb</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="/theme/css/poole.css" />
+		<link rel="stylesheet" href="/theme/css/hyde.css" />
+		<link rel="stylesheet" href="/theme/css/syntax.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+		<!-- RSS -->
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+	</head>
+
+	<body class="theme-base-0d">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="/images/avatar.png">
+					Bobbbb
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">I'm SpongeBob, a student from BUAA. Working in ACT lab. </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-nav">
+			<a class="sidebar-nav-item" href="http://weibo.com/u/2893779987">
+				<i class="fa fa-weibo"></i>
+			</a>
+			<a class="sidebar-nav-item" href="https://github.com/spongeBbob">
+				<i class="fa fa-github"></i>
+			</a>
+			
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">基于语义扩展Embedding细胞词库和SVM的微博短文本快速深度分类技术</h1>
+	<span class="post-date">二 06 九月 2016</span>
+	<h1>概述</h1>
+<p>任务目标：给定一系列文本（微博、新闻等），做分类，分类出诸如“社会民生”，“公共安全”，“科教文卫”，“政治敏感”等</p>
+<p>所用技术：布隆过滤器，支持向量机，搜狗细胞词库</p>
+<ul>
+<li><code>布隆过滤器</code></li>
+</ul>
+<p>对于原理来说很简单，位数组+k个独立hash函数。将hash函数对应的值的位数组置1，查找时如果发现所有hash函数对应位都是1说明存在，很明显这个过程并不保证查找的结果是100%正确的。</p>
+<p>Bloom Filter的这种高效是有一定代价的：在判断一个元素是否属于某个集合时，有可能会把不属于这个集合的元素误认为属于这个集合（false positive）。因此，Bloom Filter不适合那些“零错误”的应用场合。而在能容忍低错误率的应用场合下，Bloom Filter通过极少的错误换取了存储空间的极大节省。</p>
+<ul>
+<li><code>搜狗细胞词库</code></li>
+</ul>
+<p>可以理解为一个词典，一系列相关的词汇，比如“传染病词库”，里面就包含了各种跟传染病相关的词，比如流行性感冒，狂犬病等等</p>
+<ul>
+<li><code>支持向量机</code></li>
+</ul>
+<p>这个展开就比较麻烦了，由于有现成的代码，我们拿他当一个分类器使用。在给定样本训练好后可以做分类。比如，输入一堆人工标记为猫的图片和一堆人工标记为狗的图片训练得到一个分类器。这样再来一个新的图片，就可以识别出来。</p>
+<p>#架构</p>
+<p><img alt="" src="/images/wenbenfenlei1.jpg" /></p>
+<ul>
+<li><code>word2vec</code></li>
+</ul>
+<p>谷歌开源的一个词向量提取工具，在我们文本分类工作的作用是<code>找近义词</code>，词向量有很多有趣的性质，比如近义词就是通过寻找word embedding之后得到的词向量，其<code>夹角较小</code>或者<code>欧几里得距离较近</code>的一组向量。在可视化工具中表现为一个聚类</p>
+<ul>
+<li><code>特征设计</code></li>
+</ul>
+<p>如何为长短文本设计一个可表示的向量形式。作为支持向量机的输入。</p>
+<h1>算法</h1>
+<p>分词-&gt;统计词以及词的近义词（使用word2vec）在细胞词库中出现的次数。细胞词库在程序初始化的时候已经在布隆过滤器中存好。得到一个向量，向量的每一维度就是文本在对应细胞词库中出现的次数。最简单的算法就是，在一个领域出现的词越多，就说明我的文本属于这个领域的可能性越大。</p>
+<p>比如有这样一个文本“习近平总书记出席G20杭州峰会”，其中习近平、总书记、出席、峰会都映射到了政治敏感的细胞词库中，那么我这个文本极有可能属于政治敏感类。</p>
+<p>当然，为了更准确，我们要使用支持向量机，使用支持向量机就多了一步操作，特征（文本向量）的归一化，归一化的方法是，用每一维除以所有维的加和，这样向量的每一维都映射到了一个0-1之间的数。</p>
+<p>使用libsvm的库，就可以做训练了。训练好了之后，拿到新的文本做分类的工作也是首先提取特征，方法不变，然后输入SVM得到结果。</p>
+	<div id="disqus_thread"></div>
+		<script type="text/javascript">
+			var disqus_shortname = 'spongeBbob';
+			(function() {
+	 			var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	 			dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	 			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	 		})();
+		</script>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</div>
+		</div>
+	</body>
+</html>

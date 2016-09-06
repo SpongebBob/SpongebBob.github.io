@@ -51,6 +51,31 @@
 </div>		<div class="content container">
 	<div class="posts">
 			<div class="post">
+				<h1 class="post-title" href="/ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu.html#ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu">
+					<a href="/ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu.html#ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu">基于语义扩展Embedding细胞词库和SVM的微博短文本快速深度分类技术</a>
+				</h1>
+				<span class="post-date">二 06 九月 2016</span>
+				<p>
+					<h1>概述</h1>
+<p>任务目标：给定一系列文本（微博、新闻等），做分类，分类出诸如“社会民生”，“公共安全”，“科教文卫”，“政治敏感”等</p>
+<p>所用技术：布隆过滤器，支持向量机，搜狗细胞词库</p>
+<ul>
+<li><code>布隆过滤器</code></li>
+</ul>
+<p>对于原理来说很简单，位数组+k个独立hash函数。将hash函数对应的值的位数组置1，查找时如果发现所有hash函数对应位都是1说明存在，很明显这个过程并不保证查找的结果是100%正确的。</p>
+<p>Bloom Filter的这种高效是有一定代价的：在判断一个元素是否属于某个集合时，有可能会把不属于这个集合的元素误认为属于这个集合（false positive）。因此，Bloom Filter不适合那些“零错误”的应用场合。而在能容忍低错误率的应用场合下，Bloom Filter通过极少的错误换取了存储空间的极大节省。</p>
+<ul>
+<li><code>搜狗细胞词库</code></li>
+</ul>
+<p>可以理解为一个词典，一系列相关的词汇，比如“传染病词库”，里面就包含了各种跟传染病相关的词，比如流行性感冒，狂犬病等等</p>
+<ul>
+<li><code>支持向量机</code></li>
+</ul>
+<p>这个展开就比较麻烦了，由于有现成的代码，我们拿他当一个分类器使用 ...</p>
+				</p>
+				<a class="read-more" href="ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu.html">Continue reading »</a>
+			</div>
+			<div class="post">
 				<h1 class="post-title" href="/incremental-learning-in-glove.html#incremental-learning-in-glove">
 					<a href="/incremental-learning-in-glove.html#incremental-learning-in-glove">Incremental Learning in Glove</a>
 				</h1>
