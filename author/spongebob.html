@@ -51,6 +51,88 @@
 </div>		<div class="content container">
 	<div class="posts">
 			<div class="post">
+				<h1 class="post-title" href="/shi-yong-tensorflowgou-jian-juan-ji-shen-jing-wang-luo.html#shi-yong-tensorflowgou-jian-juan-ji-shen-jing-wang-luo">
+					<a href="/shi-yong-tensorflowgou-jian-juan-ji-shen-jing-wang-luo.html#shi-yong-tensorflowgou-jian-juan-ji-shen-jing-wang-luo">使用tensorflow构建卷积神经网络</a>
+				</h1>
+				<span class="post-date">一 24 十月 2016</span>
+				<p>
+					<p>机器学习火了几年之后，最近深度学习开始热炒，最近Google开源了tensorflow这个深度学习框架，从而使得编写代码相当容易，再也不用跳进数学坑求导了。[微笑]所以这篇文章也忽略很多的数学推导，专注于代码的实现。</p>
+<h2>CNN</h2>
+<p>CNN ,<code>Convolutional Neural Network</code>卷积神经网络，它吸收了很多人类认知自然世界的特点，在计算机视觉领域取得了非常重大的突破。</p>
+<h3>1卷积</h3>
+<p>首先了解下卷积的概念，这里只讲针对图像的卷积操作，数学上的严格定义就忽略了。卷积，首先要有卷积核，卷积核是一个模板
+</p>
+<div class="math">$$ \begin{bmatrix}
+ -1&amp; 0 &amp;1 \\ 
+ -2&amp; 0 &amp; 2\\ 
+ -1&amp; 0 &amp; 1
+\end{bmatrix}$$</div>
+<p>
+这个就是大名鼎鼎的Sobel卷积核，可以用来提取图像的边缘。而卷积运算可以用这种图比较形象的表示
+<img alt="" src="/images/conv1.png" />
+一句话：对应位置相乘再全部相加，针对图像的卷积操作就是使用卷积核以滑动窗口的方式走过整个的图像，做卷积运算，从而计算出新的图像。</p>
+<h3>2权值共享</h3>
+<p>第二个重要的概念就是权值共享，它基于人类认知一个事物的方式的稳定性，（认知一个局部的特征对别的地方也适用），与全连接神经网络不通的是，卷积层与输出之间的参数是共享的 ...</p><script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+				</p>
+				<a class="read-more" href="shi-yong-tensorflowgou-jian-juan-ji-shen-jing-wang-luo.html">Continue reading »</a>
+			</div>
+			<div class="post">
 				<h1 class="post-title" href="/ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu.html#ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu">
 					<a href="/ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu.html#ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu">基于语义扩展Embedding细胞词库和SVM的微博短文本快速深度分类技术</a>
 				</h1>
