@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>Bobbbb</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="/theme/css/poole.css" />
+		<link rel="stylesheet" href="/theme/css/hyde.css" />
+		<link rel="stylesheet" href="/theme/css/syntax.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+		<!-- RSS -->
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+	</head>
+
+	<body class="theme-base-0d">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="/images/avatar.png">
+					Bobbbb
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">I'm SpongeBob, a student from BUAA. Working in ACT lab. </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-nav">
+			<a class="sidebar-nav-item" href="http://weibo.com/u/2893779987">
+				<i class="fa fa-weibo"></i>
+			</a>
+			<a class="sidebar-nav-item" href="https://github.com/spongeBbob">
+				<i class="fa fa-github"></i>
+			</a>
+			
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">使用tensorflow构建卷积神经网络</h1>
+	<span class="post-date">一 24 十月 2016</span>
+	<p>机器学习火了几年之后，最近深度学习开始热炒，最近Google开源了tensorflow这个深度学习框架，从而使得编写代码相当容易，再也不用跳进数学坑求导了。[微笑]所以这篇文章也忽略很多的数学推导，专注于代码的实现。</p>
+<h2>CNN</h2>
+<p>CNN ,<code>Convolutional Neural Network</code>卷积神经网络，它吸收了很多人类认知自然世界的特点，在计算机视觉领域取得了非常重大的突破。</p>
+<h3>1卷积</h3>
+<p>首先了解下卷积的概念，这里只讲针对图像的卷积操作，数学上的严格定义就忽略了。卷积，首先要有卷积核，卷积核是一个模板
+</p>
+<div class="math">$$ \begin{bmatrix}
+ -1&amp; 0 &amp;1 \\ 
+ -2&amp; 0 &amp; 2\\ 
+ -1&amp; 0 &amp; 1
+\end{bmatrix}$$</div>
+<p>
+这个就是大名鼎鼎的Sobel卷积核，可以用来提取图像的边缘。而卷积运算可以用这种图比较形象的表示
+<img alt="" src="/images/conv1.png" />
+一句话：对应位置相乘再全部相加，针对图像的卷积操作就是使用卷积核以滑动窗口的方式走过整个的图像，做卷积运算，从而计算出新的图像。</p>
+<h3>2权值共享</h3>
+<p>第二个重要的概念就是权值共享，它基于人类认知一个事物的方式的稳定性，（认知一个局部的特征对别的地方也适用），与全连接神经网络不通的是，卷积层与输出之间的参数是共享的，所以连接数目的大大减少。极大的减少了训练神经网络的运算量。</p>
+<h3>3池化</h3>
+<p>我的理解是，对于卷积层提取的特征进行进一步的精粹，通常的操作对一个区域取max，或者mean，最大或者均值。</p>
+<h3>4代码实现</h3>
+<p>使用CNN做MNIST数据集上的手写数字识别可以达到惊人的百分之99..
+下面我们来看一下如何使用tensorflow构建卷积神经网络，这部分主要参考自tensorflow的官方文档，狗尾续貂的加了些注释
+首先定义几个用于初始化的参数的函数，权重和bias。</p>
+<h5>4.1生成权重和bias</h5>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">weight_variable</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+    <span class="n">initial</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">stddev</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span><span class="c1">#返回一个tensor，其中的元素符合正态</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span>
+</pre></div>
+
+
+<p>这个方法中，使用了生成正态分布的方法。用于权重的初始化，这个用来全连接层和卷积层的参数</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">bias_variable</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+    <span class="n">initial</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span><span class="p">)</span><span class="c1">#返回一个tensor其中的constant是0.1</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span>
+</pre></div>
+
+
+<p>bias是一个比较小的常量，偏执通常选一个比较小的正数</p>
+<h5>4.2卷积核池化</h5>
+<p>这里注意strides是步长，strides[1]和strides[2]分别是水平和竖直方向上的跨步，SAME是卷积处理边缘的方式
+在池化方法中,ksize定义了池化大小，ksizep[1]和ksizep[2]分别是池化层的长和款，strides是跨步同上，SAME同上</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">conv2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span><span class="c1">#x is input ,W is input, dtides 补偿，第一个和最后一个都是1，水平竖直strides==1</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">padding</span> <span class="o">=</span> <span class="s1">&#39;SAME&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">max_pool_2x2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span><span class="c1">#define the size of pool</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ksize</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;SAME&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h5>4.3placeholder的定义和输入</h5>
+<p><code>None</code> 是用来定义不限制维度大小的一个参数，784=28 * 28是一个手写数字图像的二值化图像像素特征，placeholder是一个萝卜坑，用来放一些数据和feed_dict结合使用，这里的x就是一个batch_size的数量，y是结果向量，最大的那一维度就是结果，</p>
+<div class="highlight"><pre><span></span><span class="n">mnist</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s2">&quot;MNIST_data/&quot;</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">784</span><span class="p">])</span>
+<span class="n">y_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+<span class="c1">#define placeholder for inputs to network</span>
+<span class="n">x_image</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">,[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="c1">#所有图片的维度为,28*28,channel=1</span>
+</pre></div>
+
+
+<h5>4.4定义卷积层，池化层和全连接层</h5>
+<p>这部分也是关键的地方，一定要注意网络构建中维度的变化，我们大体的趋势是，图像从二维变到高维度，长度和宽度越来越窄，高度越来越高。</p>
+<p>第一层卷积，把图像变为了28<em>28</em>32，然后用一个2 * 2的池化，把图像变为了7 * 7 * 32，然后再
+一层卷积，图像变为7 * 7 * 64,然后把这个特征输入到全连接神经网络训练。使用softmax激活得到最终的结果。dropout是为了防止过拟合。</p>
+<div class="highlight"><pre><span></span><span class="c1">#layer1</span>
+<span class="n">W_conv1</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">])</span><span class="c1">#patch 5*5, insize = 1, channel = 32，</span>
+<span class="n">b_conv1</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="mi">32</span><span class="p">])</span><span class="c1">#[32]</span>
+<span class="n">h_conv1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">conv2d</span><span class="p">(</span><span class="n">x_image</span><span class="p">,</span><span class="n">W_conv1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b_conv1</span><span class="p">)</span><span class="c1">#非线性化#28 * 28 *32</span>
+<span class="n">h_pool1</span> <span class="o">=</span> <span class="n">max_pool_2x2</span><span class="p">(</span><span class="n">h_conv1</span><span class="p">)</span>
+<span class="c1">#layer2</span>
+
+<span class="n">W_conv2</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">64</span><span class="p">])</span>
+<span class="n">b_conv2</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="mi">64</span><span class="p">])</span>
+
+<span class="n">h_conv2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">conv2d</span><span class="p">(</span><span class="n">h_pool1</span><span class="p">,</span> <span class="n">W_conv2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b_conv2</span><span class="p">)</span>
+<span class="n">h_pool2</span> <span class="o">=</span> <span class="n">max_pool_2x2</span><span class="p">(</span><span class="n">h_conv2</span><span class="p">)</span>
+
+<span class="c1">#fuc1</span>
+<span class="n">W_fc1</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">7</span><span class="o">*</span><span class="mi">7</span><span class="o">*</span><span class="mi">64</span><span class="p">,</span><span class="mi">1024</span><span class="p">])</span>
+<span class="n">b_fc1</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="mi">1024</span><span class="p">])</span>
+<span class="n">h_pool2_flat</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h_pool2</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="o">*</span><span class="mi">7</span><span class="o">*</span><span class="mi">64</span><span class="p">])</span>
+<span class="n">h_fc1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">h_pool2_flat</span><span class="p">,</span> <span class="n">W_fc1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b_fc1</span><span class="p">)</span>
+<span class="n">keep_prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
+<span class="n">h_fc1_drop</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">h_fc1</span><span class="p">,</span><span class="n">keep_prob</span><span class="p">)</span> <span class="c1">#dropout为了防止过拟合</span>
+</pre></div>
+
+
+<h5>4.5模型评估</h5>
+<p>使用的优化器是AdamOptimizer，来优化交叉熵cost，batch_size = 50，每100步输出测试准确度，求准确率的那行代码比较有意思，算是trick，可以自己看看，还有就是python的eval()，把动态语言的优点发挥到了极致</p>
+<div class="highlight"><pre><span></span><span class="n">cross_entropy</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">y_</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y_conv</span><span class="p">))</span>
+<span class="n">train_step</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">cross_entropy</span><span class="p">)</span>
+<span class="n">correct_prediction</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_conv</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">correct_prediction</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">))</span>
+<span class="n">init</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">initialize_all_variables</span><span class="p">()</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20000</span><span class="p">):</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">next_batch</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">train_accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">sess</span><span class="p">,</span><span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span><span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y_</span><span class="p">:</span><span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">keep_prob</span><span class="p">:</span><span class="mf">1.0</span><span class="p">})</span>
+        <span class="k">print</span> <span class="s2">&quot;step </span><span class="si">%d</span><span class="s2">,train_accuracy </span><span class="si">%g</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">train_accuracy</span><span class="p">)</span>
+    <span class="n">train_step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">sess</span><span class="p">,</span><span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span><span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y_</span><span class="p">:</span><span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">keep_prob</span><span class="p">:</span><span class="mf">0.5</span><span class="p">})</span>
+<span class="k">print</span> <span class="s2">&quot;test accuracy </span><span class="si">%g</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">accuracy</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">sess</span><span class="p">,</span><span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span><span class="n">mnist</span><span class="o">.</span><span class="n">images</span><span class="p">,</span><span class="n">y_</span><span class="p">:</span><span class="n">mnist</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span><span class="n">keep_prob</span><span class="p">:</span><span class="mf">1.0</span><span class="p">})</span>
+</pre></div>
+
+
+<h3>5完整代码</h3>
+<div class="highlight"><pre><span></span><span class="c1">#-*-coding:utf-8-*-</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.examples.tutorials.mnist</span> <span class="kn">import</span> <span class="n">input_data</span>
+
+<span class="n">mnist</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s2">&quot;MNIST_data/&quot;</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">784</span><span class="p">])</span>
+<span class="n">y_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">weight_variable</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+    <span class="n">initial</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">stddev</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span><span class="c1">#返回一个tensor，其中的元素符合正态</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">bias_variable</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+    <span class="n">initial</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span><span class="p">)</span><span class="c1">#返回一个元素其中的constant是0.1</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">conv2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span><span class="c1">#x is input ,W is input, dtides 补偿，第一个和最后一个都是1，水平竖直strides==1</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">padding</span> <span class="o">=</span> <span class="s1">&#39;SAME&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">max_pool_2x2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span><span class="c1">#define the size of pool</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ksize</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;SAME&#39;</span><span class="p">)</span>
+<span class="c1">#define placeholder for inputs to network</span>
+<span class="n">x_image</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">,[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="c1">#所有图片的维度为,28*28,channel=1</span>
+
+<span class="c1">#layer1</span>
+<span class="n">W_conv1</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">])</span><span class="c1">#patch 5*5, insize = 1, channel = 32，</span>
+<span class="n">b_conv1</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="mi">32</span><span class="p">])</span><span class="c1">#[32]</span>
+<span class="n">h_conv1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">conv2d</span><span class="p">(</span><span class="n">x_image</span><span class="p">,</span><span class="n">W_conv1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b_conv1</span><span class="p">)</span><span class="c1">#非线性化#28 * 28 *32</span>
+<span class="n">h_pool1</span> <span class="o">=</span> <span class="n">max_pool_2x2</span><span class="p">(</span><span class="n">h_conv1</span><span class="p">)</span>
+<span class="c1">#layer2</span>
+
+<span class="n">W_conv2</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">64</span><span class="p">])</span>
+<span class="n">b_conv2</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="mi">64</span><span class="p">])</span>
+
+<span class="n">h_conv2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">conv2d</span><span class="p">(</span><span class="n">h_pool1</span><span class="p">,</span> <span class="n">W_conv2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b_conv2</span><span class="p">)</span>
+<span class="n">h_pool2</span> <span class="o">=</span> <span class="n">max_pool_2x2</span><span class="p">(</span><span class="n">h_conv2</span><span class="p">)</span>
+
+<span class="c1">#fuc1</span>
+<span class="n">W_fc1</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">7</span><span class="o">*</span><span class="mi">7</span><span class="o">*</span><span class="mi">64</span><span class="p">,</span><span class="mi">1024</span><span class="p">])</span>
+<span class="n">b_fc1</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="mi">1024</span><span class="p">])</span>
+<span class="n">h_pool2_flat</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h_pool2</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="o">*</span><span class="mi">7</span><span class="o">*</span><span class="mi">64</span><span class="p">])</span>
+<span class="n">h_fc1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">h_pool2_flat</span><span class="p">,</span> <span class="n">W_fc1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b_fc1</span><span class="p">)</span>
+<span class="n">keep_prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
+<span class="n">h_fc1_drop</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">h_fc1</span><span class="p">,</span><span class="n">keep_prob</span><span class="p">)</span> <span class="c1">#??为了防止过拟合</span>
+
+<span class="c1">#fuc2</span>
+<span class="n">W_fc2</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">1024</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+<span class="n">b_fc2</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="mi">10</span><span class="p">])</span>
+<span class="n">y_conv</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">h_fc1_drop</span><span class="p">,</span> <span class="n">W_fc2</span><span class="p">)</span><span class="o">+</span><span class="n">b_fc2</span><span class="p">)</span>
+
+<span class="n">cross_entropy</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">y_</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y_conv</span><span class="p">))</span>
+<span class="n">train_step</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">cross_entropy</span><span class="p">)</span>
+<span class="n">correct_prediction</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_conv</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">correct_prediction</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">))</span>
+<span class="n">init</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">initialize_all_variables</span><span class="p">()</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20000</span><span class="p">):</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">next_batch</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">train_accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">sess</span><span class="p">,</span><span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span><span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y_</span><span class="p">:</span><span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">keep_prob</span><span class="p">:</span><span class="mf">1.0</span><span class="p">})</span>
+        <span class="k">print</span> <span class="s2">&quot;step </span><span class="si">%d</span><span class="s2">,train_accuracy </span><span class="si">%g</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">train_accuracy</span><span class="p">)</span>
+    <span class="n">train_step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">sess</span><span class="p">,</span><span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span><span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y_</span><span class="p">:</span><span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">keep_prob</span><span class="p">:</span><span class="mf">0.5</span><span class="p">})</span>
+<span class="k">print</span> <span class="s2">&quot;test accuracy </span><span class="si">%g</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">accuracy</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">sess</span><span class="p">,</span><span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span><span class="n">mnist</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">images</span><span class="p">,</span><span class="n">y_</span><span class="p">:</span><span class="n">mnist</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span><span class="n">keep_prob</span><span class="p">:</span><span class="mf">1.0</span><span class="p">})</span>
+</pre></div>
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+	<div id="disqus_thread"></div>
+		<script type="text/javascript">
+			var disqus_shortname = 'spongeBbob';
+			(function() {
+	 			var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	 			dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	 			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	 		})();
+		</script>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</div>
+		</div>
+	</body>
+</html>
