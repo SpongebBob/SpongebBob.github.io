@@ -52,12 +52,12 @@
 <div class="post">
 	<h1 class="post-title">记第一次Kaggle比赛拿银经验总结</h1>
 	<span class="post-date">日 11 六月 2017</span>
-	<p>Author：<a href="acn.ac.cn">Spongebob</a> &amp; <a href="http://www.jianshu.com/u/d130a6d54c7b">shiyi001</a></p>
-<p>众所周知，Kaggle是一个全球知名的大数据竞赛。能在Kaggle比赛中获得一个好的名次，是对一个data scientist最好的肯定。现在，我就把自己参加Kaggle的经历写下来，希望能帮到各位Kagglers。</p>
+	<p>作者：<a href="acn.ac.cn">Spongebob</a> &amp; <a href="http://www.jianshu.com/u/d130a6d54c7b">shiyi001</a></p>
+<p>众所周知，Kaggle是一个全球知名的大数据竞赛。能在Kaggle比赛中获得一个好的名次，是对一个data scientist最好的肯定。可能很多参加过校招的小伙伴有被问到是否有Kaggle比赛经验。现在，我就把自己参加Kaggle的经历写下来，希望能帮到各位Kagglers。</p>
 <blockquote>
 <p>PS 本文假设读者对 Machine Learning 的基本概念和常见模型已经有一定了解。 Enjoy Reading!</p>
 </blockquote>
-<p>我参加的是Kaggle的Quora Question Pairs比赛，共3394支队伍参赛。最后我们队获得了135名（top 4%）的好成绩。在此，我们将自己参加比赛的具体流程和心路历程记录下来。完整代码及心得体会在<a href="https://github.com/PPshrimpGo/Quora-Kaggle">PPshrimpGo/Quora-Kaggle</a></p>
+<p>我参加的是Kaggle的Quora Question Pairs比赛，这是一个对新人非常友好的比赛。问题比较clean，就是判断两个问题说的是不是一件事情。比如：程序员有一个漂亮的女朋友是一种怎样的体验？&amp; 码农有一个颜值报表的女票是一种怎样的体验？ 共3394支队伍参赛。据说此次比赛竞争非常激烈，Kaggle rank top 9的大佬都有参加这次比赛，最后我们队获得了135名（top 4%）的成绩，拿到一枚银牌。作为一个新手很是很满意的。在此，我们将自己参加比赛的具体流程和心路历程记录下来。完整代码及心得体会在<a href="https://github.com/PPshrimpGo/Quora-Kaggle">PPshrimpGo/Quora-Kaggle</a>，有什么问题欢迎到github提交issue。</p>
 <h3>数据分析 &amp;&amp; 数据预处理</h3>
 <p>在参加比赛后，我们要先对数据进行分析。由于数据量很大，光靠肉眼显然是不够的。在此，我们需要使用一些数据分析工具以及可视化工具，如<a href="http://pandas.pydata.org/">pandas</a>,<a href="http://matplotlib.org/">matplotlib</a>, <a href="http://seaborn.pydata.org/">seaborn</a>等。</p>
 <p>对数据做初步的分析非常有意义，比如对于分类问题中的特征按特征观察数据的分布，可以直观的看出这个特征是否有足够的“区分度”。</p>
@@ -66,23 +66,29 @@
 <p>除了数据本身存在的问题，我们为了更好地提取特征和训练模型，也需要对数据进行特殊处理（数据清洗）。例如在本次比赛中，很多队伍选择将连在一起的词拆开（What's -&gt; What is）,替换原句中的非英文单词等（印度语 -&gt; 英语）。</p>
 <p>数据清洗的在比赛中可能起到很关键的作用，异常值的剔除和一些空值的补足会给特征提取减弱噪声，加速模型的构建。通常数据清洗的手段有以下：</p>
 <ul>
-<li>补充空值</li>
-<li>剔除异常值</li>
-<li>数据的转化</li>
+<li>
+<p>补充空值</p>
+</li>
+<li>
+<p>剔除异常值</p>
+</li>
+<li>
+<p>数据的转化</p>
+</li>
 </ul>
 <p>具体的方法在<a href="https://dnc1994.com/2016/04/rank-10-percent-in-first-kaggle-competition/">如何在 Kaggle 首战中进入前 10%</a>博客中有详细介绍，在此不再赘述。</p>
 <h3>特征工程</h3>
 <p>一场Kaggle比赛，最重要的就是特征工程。一个良好的特征给预测结果带来的提升是显而易见的。很多人在做特征工程时很容易没有头绪，下面我就说一说我们在这次比赛中的特征提取思路。</p>
 <p>首先，由于Quora Question Pairs属于自然语言处理的文本相似性问题。在考虑问题的时候，我们从两方面进行思考：</p>
 <blockquote>
-<p>1 传统文本特征
-2 词向量特征</p>
+<p>1 传统文本特征</p>
+<p>2 词向量特征</p>
 </blockquote>
 <p>在这两个方向，我们挖掘了30+个特征，获得了大约0.30的Public LB Score。</p>
 <p>在这一部分工作做完之后，我们接下来做了另外两部分工作。</p>
 <blockquote>
-<p>1 研究最新的关于文本相似性的论文，从论文中获取灵感。并且，我们将论文中的一些算法实现，并将其加入我们的特征。
-2 查看Kaggle上面的Kernel和discussion。Kaggle是一个非常活跃和乐于分享的社区，很多人都愿意把自己的思路放上来供大家参考。</p>
+<p>1 研究最新的关于文本相似性的论文，从论文中获取灵感。并且，我们将论文中的一些算法实现，并将其加入我们的特征。</p>
+<p>2 查看Kaggle上面的Kernel和discussion。Kaggle是一个非常活跃和乐于分享的社区，很多人都愿意把自己的思路放上来供大家参考。</p>
 </blockquote>
 <p>从这两部分工作中，我们又获得了许多特征，包括了两个一度被认为是leaky的magic feature（这两个特征帮我们提升了接近0.1）。加上以上特征，我们的Public LB Score来到了0.15左右。</p>
 <p>在这一部分，建议大家挖掘特征方向可以思维开阔一些，有时候顺着别人的思路，会走的比较深，比如本次比赛的magic feature从基于图的角度出发，挖掘到了特征，赛后看到top n的经验分享，很多人在此基础上，挖掘了更多基于图的特征，取得了不错的效果。</p>
@@ -90,31 +96,56 @@
 <h3>模型融合</h3>
 <p>在之前的特征工程中，我们一直是使用的xgboost作为单模型跑。融合阶段，我们决定使用stacking方法。</p>
 <blockquote>
-<p>Stacking
-相比 Blending，Stacking 能更好地利用训练数据。以 5-Fold Stacking 为例，它的基本原理如图所示：</p>
+<p>Stacking</p>
+<p>相比 Blending，Stacking 能更好地利用训练数据。以 5-Fold Stacking 为例，它的基本原理如图所示：</p>
 <p><img alt="Stacking" src="http://upload-images.jianshu.io/upload_images/3310089-92c111b4d4c648c7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" /></p>
 <p>整个过程很像 Cross Validation。首先将训练数据分为 5 份，接下来一共 5 个迭代，每次迭代时，将 4 份数据作为 Training Set 对每个 Base Model 进行训练，然后在剩下一份 Hold-out Set 上进行预测。同时也要将其在测试数据上的预测保存下来。这样，每个 Base Model 在每次迭代时会对训练数据的其中 1 份做出预测，对测试数据的全部做出预测。5 个迭代都完成以后我们就获得了一个 #训练数据行数 x #Base Model 数量 的矩阵，这个矩阵接下来就作为第二层的 Model 的训练数据。当第二层的 Model 训练完以后，将之前保存的 Base Model 对测试数据的预测（因为每个 Base Model 被训练了 5 次，对测试数据的全体做了 5 次预测，所以对这 5 次求一个平均值，从而得到一个形状与第二层训练数据相同的矩阵）拿出来让它进行预测，就得到最后的输出。</p>
 </blockquote>
-<p>Base Model 选择如下：
-- xgboost(0.14),
-- LoesticRegression(0.19),
-- RandomForestClassifier(0.19),
-- GradientBoostingClassifier(0.19),
-- MLPClassifier(0.20)
-- LSTM(0.20)</p>
-<p>经过5折stacking，我们发现效果居然还不如单模型xgboost。What a sad story！
-经过一番思考,我们认为由于不同的模型使用了相同的特征做分类，模型的diversity不足，于是在最后一天，采取了对每个fold随机采样百分之70的特征进行stacking，此番操作减小了basemodel的水平，所以最后结果并没有太大提升。</p>
+<p>Base Model 选择如下：</p>
+<ul>
+<li>
+<p>xgboost(0.14),</p>
+</li>
+<li>
+<p>LoesticRegression(0.19),</p>
+</li>
+<li>
+<p>RandomForestClassifier(0.19),</p>
+</li>
+<li>
+<p>GradientBoostingClassifier(0.19),</p>
+</li>
+<li>
+<p>MLPClassifier(0.20)</p>
+</li>
+<li>
+<p>LSTM(0.20)</p>
+</li>
+</ul>
+<p>经过5折stacking，我们发现效果居然还不如单模型xgboost。What a sad story！</p>
+<p>经过一番思考,我们认为由于不同的模型使用了相同的特征做分类，模型的diversity不足，于是在最后一天，采取了对每个fold随机采样百分之70的特征进行stacking，此番操作减小了basemodel的水平，所以最后结果并没有太大提升。</p>
 <p>最后由于时间不足，我们最后选择0.5Xgboost + 0.5LSTM草草了事。</p>
 <h3>赛后总结</h3>
 <ul>
-<li>1 因尽早进行特征管理，后期有些特征并不能起到作用甚至会有反作用。可以单独拿出这部分特征去做一些事情，特征间的多项式组合没有考虑。</li>
-<li>2 不要一头扎进单模型，尽早对其他模型进行调参，后期时间很可能不够</li>
-<li>3 及早进行stacking，可以提前发现问题并解决。</li>
-<li>4 建立自己的PipeLine。</li>
-<li>5 对DL的方法应该早早考虑和实验。</li>
+<li>
+<p>1 因尽早进行特征管理，后期有些特征并不能起到作用甚至会有反作用。可以单独拿出这部分特征去做一些事情，特征间的多项式组合没有考虑。</p>
+</li>
+<li>
+<p>2 不要一头扎进单模型，尽早对其他模型进行调参，后期时间很可能不够</p>
+</li>
+<li>
+<p>3 及早进行stacking，可以提前发现问题并解决。</p>
+</li>
+<li>
+<p>4 建立自己的PipeLine。</p>
+</li>
+<li>
+<p>5 对DL的方法应该早早考虑和实验。</p>
+</li>
 </ul>
 <h3>引用参考</h3>
-<p><a href="https://dnc1994.com/2016/04/rank-10-percent-in-first-kaggle-competition/">如何在 Kaggle 首战中进入前 10%</a></p>
+<p><a href="https://dnc1994.com/2016/04/rank-10-percent-in-first-kaggle-competition/">如何在 Kaggle 首战中进入前 10%</a>
+在此特别感谢引用博客作者dnc11994学长和小松stuart大叔在比赛期间的问题解答。</p>
 	<div id="disqus_thread"></div>
 		<script type="text/javascript">
 			var disqus_shortname = 'spongeBbob';
