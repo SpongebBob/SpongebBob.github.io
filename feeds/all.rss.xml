@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Bobbbb</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-06-11T14:26:00+08:00</updated><entry><title>记第一次Kaggle比赛拿银经验总结</title><link href="/ji-di-yi-ci-kagglebi-sai-na-yin-jing-yan-zong-jie.html" rel="alternate"></link><published>2017-06-11T14:26:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2017-06-11:ji-di-yi-ci-kagglebi-sai-na-yin-jing-yan-zong-jie.html</id><summary type="html">&lt;p&gt;Author：&lt;a href="acn.ac.cn"&gt;Spongebob&lt;/a&gt; &amp;amp; &lt;a href="http://www.jianshu.com/u/d130a6d54c7b"&gt;shiyi001&lt;/a&gt;&lt;/p&gt;
+<rss version="2.0"><channel><title>Bobbbb</title><link>/</link><description></description><lastBuildDate>Sun, 11 Jun 2017 14:26:00 +0800</lastBuildDate><item><title>记第一次Kaggle比赛拿银经验总结</title><link>/ji-di-yi-ci-kagglebi-sai-na-yin-jing-yan-zong-jie.html</link><description>&lt;p&gt;Author：&lt;a href="acn.ac.cn"&gt;Spongebob&lt;/a&gt; &amp;amp; &lt;a href="http://www.jianshu.com/u/d130a6d54c7b"&gt;shiyi001&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;众所周知，Kaggle是一个全球知名的大数据竞赛。能在Kaggle比赛中获得一个好的名次，是对一个data scientist最好的肯定。现在，我就把自己参加Kaggle的经历写下来，希望能帮到各位Kagglers。&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;PS 本文假设读者对 Machine Learning 的基本概念和常见模型已经有一定了解。 Enjoy Reading!&lt;/p&gt;
@@ -61,7 +61,7 @@
 &lt;li&gt;5 对DL的方法应该早早考虑和实验。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;引用参考&lt;/h3&gt;
-&lt;p&gt;&lt;a href="https://dnc1994.com/2016/04/rank-10-percent-in-first-kaggle-competition/"&gt;如何在 Kaggle 首战中进入前 10%&lt;/a&gt;&lt;/p&gt;</summary><category term="NLP"></category></entry><entry><title>使用tensorflow构建卷积神经网络</title><link href="/shi-yong-tensorflowgou-jian-juan-ji-shen-jing-wang-luo.html" rel="alternate"></link><published>2016-10-24T21:15:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-10-24:shi-yong-tensorflowgou-jian-juan-ji-shen-jing-wang-luo.html</id><summary type="html">&lt;p&gt;机器学习火了几年之后，最近深度学习开始热炒，最近Google开源了tensorflow这个深度学习框架，从而使得编写代码相当容易，再也不用跳进数学坑求导了。[微笑]所以这篇文章也忽略很多的数学推导，专注于代码的实现。&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://dnc1994.com/2016/04/rank-10-percent-in-first-kaggle-competition/"&gt;如何在 Kaggle 首战中进入前 10%&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">SpongeBob</dc:creator><pubDate>Sun, 11 Jun 2017 14:26:00 +0800</pubDate><guid isPermaLink="false">tag:,2017-06-11:ji-di-yi-ci-kagglebi-sai-na-yin-jing-yan-zong-jie.html</guid><category>NLP</category></item><item><title>使用tensorflow构建卷积神经网络</title><link>/shi-yong-tensorflowgou-jian-juan-ji-shen-jing-wang-luo.html</link><description>&lt;p&gt;机器学习火了几年之后，最近深度学习开始热炒，最近Google开源了tensorflow这个深度学习框架，从而使得编写代码相当容易，再也不用跳进数学坑求导了。[微笑]所以这篇文章也忽略很多的数学推导，专注于代码的实现。&lt;/p&gt;
 &lt;h2&gt;CNN&lt;/h2&gt;
 &lt;p&gt;CNN ,&lt;code&gt;Convolutional Neural Network&lt;/code&gt;卷积神经网络，它吸收了很多人类认知自然世界的特点，在计算机视觉领域取得了非常重大的突破。&lt;/p&gt;
 &lt;h3&gt;1卷积&lt;/h3&gt;
@@ -294,7 +294,7 @@
         "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</summary><category term="Machine Learning"></category></entry><entry><title>基于语义扩展Embedding细胞词库和SVM的微博短文本快速深度分类技术</title><link href="/ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu.html" rel="alternate"></link><published>2016-09-06T18:59:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-09-06:ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu.html</id><summary type="html">&lt;h1&gt;概述&lt;/h1&gt;
+&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">SpongeBob</dc:creator><pubDate>Mon, 24 Oct 2016 21:15:00 +0800</pubDate><guid isPermaLink="false">tag:,2016-10-24:shi-yong-tensorflowgou-jian-juan-ji-shen-jing-wang-luo.html</guid><category>Machine Learning</category></item><item><title>基于语义扩展Embedding细胞词库和SVM的微博短文本快速深度分类技术</title><link>/ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu.html</link><description>&lt;h1&gt;概述&lt;/h1&gt;
 &lt;p&gt;任务目标：给定一系列文本（微博、新闻等），做分类，分类出诸如“社会民生”，“公共安全”，“科教文卫”，“政治敏感”等&lt;/p&gt;
 &lt;p&gt;所用技术：布隆过滤器，支持向量机，搜狗细胞词库&lt;/p&gt;
 &lt;ul&gt;
@@ -324,7 +324,7 @@
 &lt;p&gt;分词-&amp;gt;统计词以及词的近义词（使用word2vec）在细胞词库中出现的次数。细胞词库在程序初始化的时候已经在布隆过滤器中存好。得到一个向量，向量的每一维度就是文本在对应细胞词库中出现的次数。最简单的算法就是，在一个领域出现的词越多，就说明我的文本属于这个领域的可能性越大。&lt;/p&gt;
 &lt;p&gt;比如有这样一个文本“习近平总书记出席G20杭州峰会”，其中习近平、总书记、出席、峰会都映射到了政治敏感的细胞词库中，那么我这个文本极有可能属于政治敏感类。&lt;/p&gt;
 &lt;p&gt;当然，为了更准确，我们要使用支持向量机，使用支持向量机就多了一步操作，特征（文本向量）的归一化，归一化的方法是，用每一维除以所有维的加和，这样向量的每一维都映射到了一个0-1之间的数。&lt;/p&gt;
-&lt;p&gt;使用libsvm的库，就可以做训练了。训练好了之后，拿到新的文本做分类的工作也是首先提取特征，方法不变，然后输入SVM得到结果。&lt;/p&gt;</summary><category term="NLP"></category></entry><entry><title>Incremental Learning in Glove</title><link href="/incremental-learning-in-glove.html" rel="alternate"></link><published>2016-07-18T10:18:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-18:incremental-learning-in-glove.html</id><summary type="html">&lt;p&gt;In industrial life, data usually become available gradually, this fact requires data analysis systems to have the capability to learn information incrementally.
+&lt;p&gt;使用libsvm的库，就可以做训练了。训练好了之后，拿到新的文本做分类的工作也是首先提取特征，方法不变，然后输入SVM得到结果。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">SpongeBob</dc:creator><pubDate>Tue, 06 Sep 2016 18:59:00 +0800</pubDate><guid isPermaLink="false">tag:,2016-09-06:ji-yu-yu-yi-kuo-zhan-embeddingxi-bao-ci-ku-he-svmde-wei-bo-duan-wen-ben-kuai-su-shen-du-fen-lei-ji-zhu.html</guid><category>NLP</category></item><item><title>Incremental Learning in Glove</title><link>/incremental-learning-in-glove.html</link><description>&lt;p&gt;In industrial life, data usually become available gradually, this fact requires data analysis systems to have the capability to learn information incrementally.
 Learning from new data without forgetting prior knowledge is known as incremental learning. What's more, if we don't abadon these knowledge, the stupid thing is to learn from 0. In order to overcome this, we find out a way to learn knowledge from the incresement part. In this way, the previously learned information is not lost, and it could be more fast than learning from 0.&lt;/p&gt;
 &lt;p&gt;GloVe has been introduced in the previos blog. As we know, the objective function is&lt;/p&gt;
 &lt;p&gt;&lt;img alt="" src="/images/IL1.png" /&gt;&lt;/p&gt;
@@ -405,7 +405,7 @@ Learning from new data without forgetting prior knowledge is known as incrementa
         "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</summary><category term="NLP"></category></entry><entry><title>BP神经网络</title><link href="/bpshen-jing-wang-luo.html" rel="alternate"></link><published>2016-07-11T20:26:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-11:bpshen-jing-wang-luo.html</id><summary type="html">&lt;p&gt;首先我们从感知器和单个神经元的关系来讲起
+&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">SpongeBob</dc:creator><pubDate>Mon, 18 Jul 2016 10:18:00 +0800</pubDate><guid isPermaLink="false">tag:,2016-07-18:incremental-learning-in-glove.html</guid><category>NLP</category></item><item><title>BP神经网络</title><link>/bpshen-jing-wang-luo.html</link><description>&lt;p&gt;首先我们从感知器和单个神经元的关系来讲起
 单个神经元&lt;/p&gt;
 &lt;hr /&gt;
 &lt;p&gt;前几天上课的时候老师讲了一个感知器的例子。当时理解不深刻，只知道这东西可以通过学习来分类一个线性可分的东西。然后还讲了感知器中的一种奇怪的并不是梯度下降的方法来训练，然而梯度下降十分好理解和好用。线性分类器确实是一类比较简单的东西。&lt;/p&gt;
@@ -631,7 +631,7 @@ Learning from new data without forgetting prior knowledge is known as incrementa
         "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</summary><category term="NLP"></category></entry><entry><title>GloVe Sumarry</title><link href="/glove-sumarry.html" rel="alternate"></link><published>2016-07-11T11:26:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-11:glove-sumarry.html</id><summary type="html">&lt;p&gt;在前边的文章我们已经讲了词向量的两种表达方式，一种是&lt;code&gt;"one-hot"&lt;/code&gt;，另外一种是&lt;code&gt;"distributed word representation"&lt;/code&gt;。针对"one-hot"的种种弊端：只能表达词本身是否出现，而无法表达词与词之间的关系。而自然语言处理中的一个基本的指导思想就是，一个词的含义，跟它的上下文有关系。比如我们可以想像一下，“坚硬的”和“冰块”共同出现的概率一定要比“坚硬的”和“河流”共同出现的概率大。他们的上下文隐含一定的语义信息。&lt;/p&gt;
+&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">SpongeBob</dc:creator><pubDate>Mon, 11 Jul 2016 20:26:00 +0800</pubDate><guid isPermaLink="false">tag:,2016-07-11:bpshen-jing-wang-luo.html</guid><category>NLP</category></item><item><title>GloVe Sumarry</title><link>/glove-sumarry.html</link><description>&lt;p&gt;在前边的文章我们已经讲了词向量的两种表达方式，一种是&lt;code&gt;"one-hot"&lt;/code&gt;，另外一种是&lt;code&gt;"distributed word representation"&lt;/code&gt;。针对"one-hot"的种种弊端：只能表达词本身是否出现，而无法表达词与词之间的关系。而自然语言处理中的一个基本的指导思想就是，一个词的含义，跟它的上下文有关系。比如我们可以想像一下，“坚硬的”和“冰块”共同出现的概率一定要比“坚硬的”和“河流”共同出现的概率大。他们的上下文隐含一定的语义信息。&lt;/p&gt;
 &lt;p&gt;针使用矩阵对表示词向量的方法，主要两种方法。一种是&lt;code&gt;“word-doc”&lt;/code&gt;另一种是&lt;code&gt;"word-word"&lt;/code&gt;，用两种统计信息来表达一个贡献矩阵。而我们今天要讨论的&lt;code&gt;GloVe&lt;/code&gt;就是采用&lt;code&gt;“word-word”&lt;/code&gt;的共现矩阵。&lt;/p&gt;
 &lt;p&gt;但是，直接直接从共现矩阵中提取的词向量，有这样一个问题，维度非常高，和预料库的文档数，以及词汇量成正相关。并且还有另外一个问题，这个矩阵可能非常稀疏。所以会浪费很多的计算和存储资源。如何解决呢？前面已经提到了。&lt;/p&gt;
 &lt;p&gt;下面就是&lt;code&gt;"distributed word representation"&lt;/code&gt;方法的优势，用一个相对低维度的向量来表示一个词的信息，而这些低维的向量也隐含了一些很有趣的信息，下面用一张图形象的表示。&lt;/p&gt;
@@ -742,7 +742,7 @@ Learning from new data without forgetting prior knowledge is known as incrementa
 
 
 &lt;p&gt;在更新梯度的时候，最后除以sqrt(gradsq[b + l1])对应的梯度开方。&lt;/p&gt;
-&lt;p&gt;这样最终得到的W矩阵中就是分解之后的词向量矩阵。&lt;/p&gt;</summary><category term="NLP"></category></entry><entry><title>word emdedding summary</title><link href="/word-emdedding-summary.html" rel="alternate"></link><published>2016-07-10T18:59:00+08:00</published><author><name>SpongeBob</name></author><id>tag:,2016-07-10:word-emdedding-summary.html</id><summary type="html">&lt;p&gt;A week ago I came to the ACT lab. My mentor gave me some papers to read. One in these papers ,&lt;a href="http://nlp.stanford.edu/pubs/glove.pdf"&gt;GloVe: Global Vectors for Word Representation.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;这样最终得到的W矩阵中就是分解之后的词向量矩阵。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">SpongeBob</dc:creator><pubDate>Mon, 11 Jul 2016 11:26:00 +0800</pubDate><guid isPermaLink="false">tag:,2016-07-11:glove-sumarry.html</guid><category>NLP</category></item><item><title>word emdedding summary</title><link>/word-emdedding-summary.html</link><description>&lt;p&gt;A week ago I came to the ACT lab. My mentor gave me some papers to read. One in these papers ,&lt;a href="http://nlp.stanford.edu/pubs/glove.pdf"&gt;GloVe: Global Vectors for Word Representation.&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This paper introduces a method to  learn vector space representations of words. The model efficiently leverages statistical information by training only on the nonzero elements in a word-word co- occurrence matrix. The result is a new global logbilinear regression model.&lt;/p&gt;
 &lt;h2&gt;What is word embedding?&lt;/h2&gt;
 &lt;p&gt;In a word, use a vector to represent a word. In this way, there are many intersting things we can get,like capturing  semantic,doing word analogy task. King - Queen = Man - Women. Just like [5,5] - [1,1] = [4,4] - [0,0].&lt;/p&gt;
@@ -815,4 +815,4 @@ Learning from new data without forgetting prior knowledge is known as incrementa
 
 &lt;p&gt;&lt;img alt="" src="/images/word-em3.png" /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;X = U*S*V&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;We only print the first two columns of the &lt;code&gt;U&lt;/code&gt; matrix to represent a word, and this is the traditional Latent Semantic Analysis (LSA). Use SVD to fatorize Words-Documents matix. And this method is widely used in product recommendation algorithm. I will write another blog to explain it.&lt;/p&gt;</summary><category term="NLP"></category></entry></feed>
+&lt;p&gt;We only print the first two columns of the &lt;code&gt;U&lt;/code&gt; matrix to represent a word, and this is the traditional Latent Semantic Analysis (LSA). Use SVD to fatorize Words-Documents matix. And this method is widely used in product recommendation algorithm. I will write another blog to explain it.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">SpongeBob</dc:creator><pubDate>Sun, 10 Jul 2016 18:59:00 +0800</pubDate><guid isPermaLink="false">tag:,2016-07-10:word-emdedding-summary.html</guid><category>NLP</category></item></channel></rss>
